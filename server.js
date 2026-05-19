@@ -7,7 +7,16 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 
 // ─── Client ───────────────────────────────────────────────────────────────────
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _client = null;
+function getClient() {
+  if (!_client) {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      throw new Error('ANTHROPIC_API_KEY environment variable is not set.');
+    }
+    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  }
+  return _client;
+}
 
 // ─── Agent Definitions ────────────────────────────────────────────────────────
 
@@ -109,7 +118,7 @@ async function runAgent(agentId, userPrompt, maxTokens = 2000) {
   jobs.push(job);
 
   try {
-    const message = await client.messages.create({
+    const message = await getClient().messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: maxTokens,
       system: agent.systemPrompt,
