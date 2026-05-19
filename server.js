@@ -58,6 +58,15 @@ const AGENTS = {
 
 let jobs = [];
 
+function parseJobOutput(job) {
+  const text = job.output ?? '';
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenced) return JSON.parse(fenced[1].trim());
+  const bare = text.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+  if (bare) return JSON.parse(bare[0]);
+  throw new Error('No JSON found in agent output');
+}
+
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
 async function runAgent(agentId, userPrompt, maxTokens = 2000) {
@@ -188,7 +197,7 @@ Return a JSON object with these exact keys:
 
   try {
     const job = await runAgent('brandStudio', prompt, 2000);
-    res.json(job);
+    res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -217,7 +226,7 @@ Return a JSON array of posts. Each post object must have these exact keys:
 
   try {
     const job = await runAgent('socialContent', prompt, 2000);
-    res.json(job);
+    res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -251,7 +260,7 @@ Return a JSON object with these exact keys:
 
   try {
     const job = await runAgent('clientBrief', prompt, 2000);
-    res.json(job);
+    res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -278,7 +287,7 @@ Return a JSON object with these exact keys:
 
   try {
     const job = await runAgent('adCreative', prompt, 2000);
-    res.json(job);
+    res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -307,7 +316,7 @@ Return a JSON object with these exact keys:
 
   try {
     const job = await runAgent('contentWriter', prompt, 2000);
-    res.json(job);
+    res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -339,7 +348,7 @@ Return a JSON object with these exact keys:
 
   try {
     const job = await runAgent('pricing', prompt, 2000);
-    res.json(job);
+    res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -373,7 +382,7 @@ Return a JSON object with these exact keys:
 
   try {
     const job = await runAgent('prospector', prompt, 3000);
-    res.json(job);
+    res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -409,7 +418,7 @@ Return a JSON object with these exact keys:
 
   try {
     const job = await runAgent('campaign', prompt, 4000);
-    res.json(job);
+    res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
