@@ -3,6 +3,7 @@ import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 
 const STORAGE_KEY = 'sq_invoices'
+const COUNTER_KEY = 'sq_invoice_counter'
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -14,8 +15,16 @@ function dueDateStr() {
   return d.toISOString().slice(0, 10)
 }
 
-function newInvoiceNumber() {
-  return `INV-${Date.now().toString().slice(-6)}`
+function nextInvoiceNumber() {
+  const current = parseInt(localStorage.getItem(COUNTER_KEY) || '0', 10)
+  const next = current + 1
+  localStorage.setItem(COUNTER_KEY, next.toString())
+  return `INV-${String(next).padStart(5, '0')}`
+}
+
+function peekInvoiceNumber() {
+  const current = parseInt(localStorage.getItem(COUNTER_KEY) || '0', 10)
+  return `INV-${String(current + 1).padStart(5, '0')}`
 }
 
 function newLineItem() {
@@ -30,7 +39,7 @@ function blankForm() {
     clientName: '',
     clientEmail: '',
     clientAddress: '',
-    invoiceNumber: newInvoiceNumber(),
+    invoiceNumber: peekInvoiceNumber(),
     invoiceDate: todayStr(),
     dueDate: dueDateStr(),
     notes: '',
@@ -163,6 +172,8 @@ export default function InvoiceGenerator() {
   }
 
   function saveInvoice() {
+    // Consume the counter so this number is officially used
+    nextInvoiceNumber()
     const subtotal = calcSubtotal(lineItems)
     const invoice = {
       id: Date.now().toString(),
@@ -175,6 +186,9 @@ export default function InvoiceGenerator() {
     setSaveSuccess(true)
     setTimeout(() => setSaveSuccess(false), 2500)
     setTab('history')
+    // Reset form with the next sequential number
+    setForm(blankForm())
+    setLineItems([newLineItem()])
   }
 
   function downloadPDF() {
