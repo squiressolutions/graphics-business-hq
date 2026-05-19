@@ -15,18 +15,18 @@ import ClientTracker from './pages/ClientTracker'
 import InvoiceGenerator from './pages/InvoiceGenerator'
 import ExpenseTracker from './pages/ExpenseTracker'
 import ContractBuilder from './pages/ContractBuilder'
+import ClientPortal from './pages/ClientPortal'
+import ClientRequests from './pages/ClientRequests'
 
 function AppShell() {
   const isMobile = () => window.innerWidth < 768
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile())
   const location = useLocation()
 
-  // Close sidebar on mobile when route changes
   useEffect(() => {
     if (isMobile()) setSidebarOpen(false)
   }, [location])
 
-  // Close on resize to mobile
   useEffect(() => {
     function onResize() {
       if (window.innerWidth < 768) setSidebarOpen(false)
@@ -40,14 +40,12 @@ function AppShell() {
 
   return (
     <div className="app-shell" data-sidebar={sidebarOpen ? 'open' : 'closed'}>
-      {/* Mobile overlay backdrop */}
       {sidebarOpen && isMobile() && (
         <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
       )}
 
       <Sidebar isOpen={sidebarOpen} onToggle={toggle} />
 
-      {/* Mobile top bar */}
       <header className="mobile-topbar">
         <button className="hamburger" onClick={toggle} aria-label="Toggle menu">
           <span /><span /><span />
@@ -72,6 +70,7 @@ function AppShell() {
           <Route path="/invoices" element={<InvoiceGenerator />} />
           <Route path="/expenses" element={<ExpenseTracker />} />
           <Route path="/contracts" element={<ContractBuilder />} />
+          <Route path="/requests" element={<ClientRequests />} />
         </Routes>
         <Footer />
       </main>
@@ -82,7 +81,11 @@ function AppShell() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppShell />
+      <Routes>
+        <Route path="/portal" element={<ClientPortal />} />
+        <Route path="/portal/*" element={<ClientPortal />} />
+        <Route path="/*" element={<AppShell />} />
+      </Routes>
     </BrowserRouter>
   )
 }

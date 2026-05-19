@@ -3,7 +3,7 @@ import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 
 // ─── Client ───────────────────────────────────────────────────────────────────
 
@@ -58,6 +58,25 @@ const AGENTS = {
       'You are a legal document specialist for creative agencies and freelancers. You draft professional client service agreements. Return valid JSON with a single key "contractText" containing the full contract as a plain-text string.',
   },
 };
+
+// ─── Client Intake Persistence ────────────────────────────────────────────────
+
+const __dirnameEarly = dirname(fileURLToPath(import.meta.url));
+const DATA_DIR = join(__dirnameEarly, 'data');
+const SUBMISSIONS_FILE = join(DATA_DIR, 'submissions.json');
+
+function loadSubmissions() {
+  try { return JSON.parse(readFileSync(SUBMISSIONS_FILE, 'utf8')); } catch { return []; }
+}
+function saveSubmissions(data) {
+  try { mkdirSync(DATA_DIR, { recursive: true }); writeFileSync(SUBMISSIONS_FILE, JSON.stringify(data, null, 2)); } catch {}
+}
+
+let submissions = loadSubmissions();
+
+function makeRefNum() {
+  return 'REQ-' + String(Date.now()).slice(-6) + Math.random().toString(36).slice(2, 5).toUpperCase();
+}
 
 // ─── Job Log ──────────────────────────────────────────────────────────────────
 
@@ -427,6 +446,56 @@ Return a JSON object with these exact keys:
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// ─── Client Intake ────────────────────────────────────────────────────────────
+
+app.post('/api/client-intake', (req, res) => {
+  const { services, budget, timeline, description, inspiration, hearAbout,
+    name, business, email, phone, website } = req.body;
+
+  const entry = {
+    id: 'sub_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    refNum: makeRefNum(),
+    status: 'new',
+    submittedAt: new Date().toISOString(),
+    services: Array.isArray(services) ? services : [],
+    budget: budget || '',
+    timeline: timeline || '',
+    description: description || '',
+    inspiration: inspiration || '',
+    hearAbout: hearAbout || '',
+    name: name || '',
+    business: business || '',
+    email: email || '',
+    phone: phone || '',
+    website: website || '',
+  };
+
+  submissions.unshift(entry);
+  saveSubmissions(submissions);
+  res.json({ id: entry.id, refNum: entry.refNum });
+});
+
+app.get('/api/client-intake', (_req, res) => {
+  res.json(submissions);
+});
+
+app.patch('/api/client-intake/:id', (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const idx = submissions.findIndex(s => s.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  submissions[idx] = { ...submissions[idx], status };
+  saveSubmissions(submissions);
+  res.json(submissions[idx]);
+});
+
+app.delete('/api/client-intake/:id', (req, res) => {
+  const { id } = req.params;
+  submissions = submissions.filter(s => s.id !== id);
+  saveSubmissions(submissions);
+  res.json({ deleted: true });
 });
 
 // ─── Contract Builder ─────────────────────────────────────────────────────────

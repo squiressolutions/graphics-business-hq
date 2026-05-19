@@ -27,6 +27,7 @@ const navSections = [
       { to: '/invoices',  icon: '🧾', label: 'Invoices' },
       { to: '/expenses',  icon: '💰', label: 'Expenses' },
       { to: '/contracts', icon: '📋', label: 'Contracts' },
+      { to: '/requests',  icon: '📥', label: 'Client Requests' },
     ],
   },
 ]
