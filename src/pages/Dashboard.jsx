@@ -105,9 +105,9 @@ export default function Dashboard() {
     <div className="page">
       <div className="page-header">
         <div className="page-eyebrow">Command Center</div>
-        <h1 className="page-title">GRAPHICS BUSINESS HQ</h1>
+        <h1 className="page-title">SQUIRES GRAPHICS</h1>
         <p className="page-subtitle">
-          6 AI agents running your graphics operation. Pick an agent or enable autopilot below.
+          8 AI agents running your graphics operation. Pick an agent or enable autopilot below.
         </p>
       </div>
 

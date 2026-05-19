@@ -4,20 +4,20 @@
 
 /* --- CSS Variables ----------------------------------------- */
 :root {
-  --bg:                #07080C;
-  --bg2:               #0F1117;
-  --bg3:               #161820;
-  --border:            #1E2130;
-  --border2:           #2A2D3E;
-  --text:              #E8ECF4;
-  --muted:             #6B7280;
-  --muted2:            #9CA3AF;
-  --accent:            #7B61FF;
-  --accent2:           #FF2D78;
-  --accent3:           #00E5FF;
-  --green:             #22C55E;
-  --orange:            #F97316;
-  --red:               #EF4444;
+  --bg:                #050C1A;
+  --bg2:               #091428;
+  --bg3:               #0D1C38;
+  --border:            #162945;
+  --border2:           #1F3A5E;
+  --text:              #EDE8D5;
+  --muted:             #6888A8;
+  --muted2:            #94AAC4;
+  --accent:            #D4A017;
+  --accent2:           #EDD86A;
+  --accent3:           #5B9BD5;
+  --green:             #3DD68C;
+  --orange:            #F59E0B;
+  --red:               #E55A5A;
   --sidebar-w:         220px;
   --sidebar-collapsed: 64px;
   --topbar-h:          56px;
@@ -311,7 +311,7 @@ a {
 }
 
 .sidebar-nav-item.active {
-  background: rgba(123, 97, 255, 0.14);
+  background: rgba(212, 160, 23, 0.14);
   color: var(--accent);
 }
 
@@ -548,12 +548,12 @@ a {
 
 .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: #07080C;
 }
 .btn-primary:hover:not(:disabled) {
-  background: #6a50f0;
+  background: #b88a12;
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(123, 97, 255, 0.35);
+  box-shadow: 0 4px 16px rgba(212, 160, 23, 0.4);
 }
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
@@ -653,7 +653,7 @@ a {
 .form-select:focus,
 .form-textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(123, 97, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.15);
 }
 
 .form-select {
@@ -696,21 +696,21 @@ a {
 }
 
 .badge-violet {
-  background: rgba(123, 97, 255, 0.15);
+  background: rgba(212, 160, 23, 0.15);
   color: var(--accent);
-  border: 1px solid rgba(123, 97, 255, 0.3);
+  border: 1px solid rgba(212, 160, 23, 0.3);
 }
 
 .badge-pink {
-  background: rgba(255, 45, 120, 0.12);
+  background: rgba(237, 216, 106, 0.12);
   color: var(--accent2);
-  border: 1px solid rgba(255, 45, 120, 0.25);
+  border: 1px solid rgba(237, 216, 106, 0.3);
 }
 
 .badge-cyan {
-  background: rgba(0, 229, 255, 0.1);
+  background: rgba(91, 155, 213, 0.12);
   color: var(--accent3);
-  border: 1px solid rgba(0, 229, 255, 0.25);
+  border: 1px solid rgba(91, 155, 213, 0.25);
 }
 
 .badge-green {
@@ -1019,7 +1019,7 @@ a {
 /* --- Quick Action Grid ------------------------------------ */
 .action-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 24px;
 }
@@ -1038,7 +1038,7 @@ a {
 .action-card:hover {
   border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(123, 97, 255, 0.12);
+  box-shadow: 0 6px 24px rgba(212, 160, 23, 0.15);
 }
 
 .action-card-icon {
@@ -1080,7 +1080,7 @@ a {
 
 .pricing-card.featured {
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(123, 97, 255, 0.18);
+  box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(212, 160, 23, 0.2);
   position: relative;
 }
 
@@ -1259,7 +1259,7 @@ a {
 }
 
 .pill.selected {
-  background: rgba(123, 97, 255, 0.18);
+  background: rgba(212, 160, 23, 0.16);
   border-color: var(--accent);
   color: var(--accent);
 }

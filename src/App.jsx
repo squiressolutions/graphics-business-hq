@@ -10,6 +10,8 @@ import ContentWriter from './pages/ContentWriter'
 import Pricing from './pages/Pricing'
 import Prospector from './pages/Prospector'
 import CampaignBuilder from './pages/CampaignBuilder'
+import ClientTracker from './pages/ClientTracker'
+import InvoiceGenerator from './pages/InvoiceGenerator'
 
 function AppShell() {
   const isMobile = () => window.innerWidth < 768
@@ -47,7 +49,7 @@ function AppShell() {
         <button className="hamburger" onClick={toggle} aria-label="Toggle menu">
           <span /><span /><span />
         </button>
-        <div className="mobile-topbar-logo">GRAFIQ</div>
+        <div className="mobile-topbar-logo">SQUIRES GRAPHICS</div>
         <div style={{ width: 40 }} />
       </header>
 
@@ -63,6 +65,8 @@ function AppShell() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/prospector" element={<Prospector />} />
           <Route path="/campaign" element={<CampaignBuilder />} />
+          <Route path="/clients" element={<ClientTracker />} />
+          <Route path="/invoices" element={<InvoiceGenerator />} />
         </Routes>
       </main>
     </div>
