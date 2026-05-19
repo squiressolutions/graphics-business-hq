@@ -3,7 +3,8 @@ import { useState } from 'react'
 const TIERS = [
   {
     name: 'Starter',
-    price: '499',
+    price: '497',
+    originalPrice: '650',
     period: 'per project',
     badge: null,
     badgeClass: null,
@@ -22,7 +23,8 @@ const TIERS = [
   },
   {
     name: 'Studio',
-    price: '1,499',
+    price: '1,197',
+    originalPrice: '1,500',
     period: 'per project',
     badge: 'Most Popular',
     description: 'Full brand identity for growing businesses ready to make a mark.',
@@ -40,7 +42,8 @@ const TIERS = [
   },
   {
     name: 'Agency',
-    price: '4,999',
+    price: '3,697',
+    originalPrice: '5,200',
     period: 'per project',
     badge: null,
     description: 'Comprehensive creative partnership for established brands going premium.',
@@ -147,6 +150,11 @@ export default function Pricing() {
                   <p className="text-muted" style={{ fontSize: 12, marginTop: 4 }}>{tier.description}</p>
                 </div>
                 <div>
+                  {tier.originalPrice && (
+                    <div style={{ fontSize: 15, color: 'var(--accent2)', textDecoration: 'line-through', marginBottom: 2 }}>
+                      ${tier.originalPrice}
+                    </div>
+                  )}
                   <div className="pricing-price"><sup>$</sup>{tier.price}</div>
                   <div className="pricing-period">{tier.period}</div>
                 </div>
