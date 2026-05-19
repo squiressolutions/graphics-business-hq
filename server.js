@@ -381,7 +381,7 @@ Return a JSON object with these exact keys:
 - objectionHandling (array of exactly 5 objects, each with: objection (string — a common sales objection such as "too expensive", "we have someone internal", "not the right time", "need to think about it", "not sure we need this"), response (string — a confident, empathetic 2-3 sentence reframe or counter that keeps the conversation going without being pushy))`;
 
   try {
-    const job = await runAgent('prospector', prompt, 3000);
+    const job = await runAgent('prospector', prompt, 6000);
     res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -417,7 +417,7 @@ Return a JSON object with these exact keys:
 - timeline (array of exactly 4 objects, each with: week (string — "Week 1", "Week 2", etc.), focus (string — the primary focus for that week), tasks (array of strings — specific action items to complete that week to launch and optimize the campaign))`;
 
   try {
-    const job = await runAgent('campaign', prompt, 4000);
+    const job = await runAgent('campaign', prompt, 8000);
     res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });
