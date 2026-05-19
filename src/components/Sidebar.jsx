@@ -23,8 +23,10 @@ const navSections = [
   {
     label: 'Business',
     items: [
-      { to: '/clients',  icon: '👥', label: 'Client Tracker' },
-      { to: '/invoices', icon: '🧾', label: 'Invoices' },
+      { to: '/clients',   icon: '👥', label: 'Client Tracker' },
+      { to: '/invoices',  icon: '🧾', label: 'Invoices' },
+      { to: '/expenses',  icon: '💰', label: 'Expenses' },
+      { to: '/contracts', icon: '📋', label: 'Contracts' },
     ],
   },
 ]
@@ -72,7 +74,7 @@ export default function Sidebar({ isOpen, onToggle }) {
         {isOpen ? (
           <>
             <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 2 }}>Powered by Claude AI</div>
-            <div style={{ fontSize: 10, color: 'var(--border2)' }}>v1.0.0 · 8 Agents</div>
+            <div style={{ fontSize: 10, color: 'var(--border2)' }}>v1.1.0 · 8 Agents</div>
           </>
         ) : (
           <div style={{ fontSize: 10, color: 'var(--border2)', textAlign: 'center' }}>SG</div>

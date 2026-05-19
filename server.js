@@ -52,6 +52,11 @@ const AGENTS = {
     systemPrompt:
       'You are a paid media strategist for creative service businesses. You build complete ad campaign structures. Return valid JSON.',
   },
+  contracts: {
+    name: 'Contract Builder',
+    systemPrompt:
+      'You are a legal document specialist for creative agencies and freelancers. You draft professional client service agreements. Return valid JSON with a single key "contractText" containing the full contract as a plain-text string.',
+  },
 };
 
 // ─── Job Log ──────────────────────────────────────────────────────────────────
@@ -418,6 +423,54 @@ Return a JSON object with these exact keys:
 
   try {
     const job = await runAgent('campaign', prompt, 8000);
+    res.json(parseJobOutput(job));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Contract Builder ─────────────────────────────────────────────────────────
+
+app.post('/api/contracts', async (req, res) => {
+  const { clientName, clientEmail, clientBusiness, projectType, projectScope,
+    totalPrice, depositPercent, startDate, deliveryDate, revisions, paymentTerms, extraClauses } = req.body;
+
+  const deposit = totalPrice
+    ? `$${(parseFloat(String(totalPrice).replace(/,/g, '')) * (parseInt(depositPercent) / 100)).toFixed(2)}`
+    : `${depositPercent}% of total`;
+
+  const prompt = `Draft a professional client service agreement for a graphic design / creative agency named Squires Solutions (squiressolutions@gmail.com).
+
+Contract Details:
+- Client Name: ${clientName}
+- Client Email: ${clientEmail || 'N/A'}
+- Client Business: ${clientBusiness || 'N/A'}
+- Project Type: ${projectType}
+- Project Scope: ${projectScope || 'As discussed'}
+- Total Price: $${totalPrice}
+- Deposit Required: ${deposit} (${depositPercent}% upfront before work begins)
+- Start Date: ${startDate || 'Upon signed agreement'}
+- Delivery Date: ${deliveryDate || 'To be determined'}
+- Revision Rounds: ${revisions}
+- Payment Terms: ${paymentTerms}
+- Additional Clauses: ${extraClauses || 'None'}
+
+The contract must include sections for:
+1. Parties & Project Overview
+2. Scope of Work & Deliverables
+3. Timeline & Milestones
+4. Pricing, Deposit & Payment Schedule
+5. Revision Policy
+6. Intellectual Property & Usage Rights
+7. Confidentiality
+8. Cancellation & Refund Policy
+9. Limitation of Liability
+10. Signatures (with blank lines for both parties)
+
+Write in formal but clear legal language. Include date and signature blocks at the end. Return JSON with key "contractText" containing the full contract as plain text (use newlines for formatting, no markdown).`;
+
+  try {
+    const job = await runAgent('contracts', prompt, 4000);
     res.json(parseJobOutput(job));
   } catch (err) {
     res.status(500).json({ error: err.message });

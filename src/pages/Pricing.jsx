@@ -151,7 +151,7 @@ export default function Pricing() {
                 </div>
                 <div>
                   {tier.originalPrice && (
-                    <div style={{ fontSize: 15, color: 'var(--accent2)', textDecoration: 'line-through', marginBottom: 2 }}>
+                    <div style={{ fontSize: 15, color: 'var(--red)', textDecoration: 'line-through', marginBottom: 2 }}>
                       ${tier.originalPrice}
                     </div>
                   )}

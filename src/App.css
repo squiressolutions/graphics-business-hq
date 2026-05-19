@@ -1351,3 +1351,82 @@ a {
 .fw-600       { font-weight: 600; }
 .truncate     { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .w-full       { width: 100%; }
+
+/* --- Site Footer ------------------------------------------ */
+.site-footer {
+  margin-top: 56px;
+  border-top: 1px solid var(--border);
+  padding: 32px 0 24px;
+}
+
+.site-footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.site-footer-brand {}
+
+.site-footer-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.site-footer-tagline {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.site-footer-contact {}
+
+.site-footer-contact-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.site-footer-link {
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s;
+  display: block;
+}
+
+.site-footer-link:hover {
+  color: var(--accent2);
+}
+
+.site-footer-right {
+  text-align: right;
+}
+
+.site-footer-copy {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.site-footer-powered {
+  font-size: 11px;
+  color: var(--border2);
+}
+
+@media (max-width: 640px) {
+  .site-footer-inner {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .site-footer-right {
+    text-align: left;
+  }
+}

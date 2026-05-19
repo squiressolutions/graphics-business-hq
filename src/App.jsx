@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
+import Footer from './components/Footer'
 import Dashboard from './pages/Dashboard'
 import BrandStudio from './pages/BrandStudio'
 import SocialContent from './pages/SocialContent'
@@ -12,6 +13,8 @@ import Prospector from './pages/Prospector'
 import CampaignBuilder from './pages/CampaignBuilder'
 import ClientTracker from './pages/ClientTracker'
 import InvoiceGenerator from './pages/InvoiceGenerator'
+import ExpenseTracker from './pages/ExpenseTracker'
+import ContractBuilder from './pages/ContractBuilder'
 
 function AppShell() {
   const isMobile = () => window.innerWidth < 768
@@ -49,7 +52,7 @@ function AppShell() {
         <button className="hamburger" onClick={toggle} aria-label="Toggle menu">
           <span /><span /><span />
         </button>
-        <div className="mobile-topbar-logo">SQUIRES GRAPHICS</div>
+        <div className="mobile-topbar-logo">SQUIRES SOLUTIONS</div>
         <div style={{ width: 40 }} />
       </header>
 
@@ -67,7 +70,10 @@ function AppShell() {
           <Route path="/campaign" element={<CampaignBuilder />} />
           <Route path="/clients" element={<ClientTracker />} />
           <Route path="/invoices" element={<InvoiceGenerator />} />
+          <Route path="/expenses" element={<ExpenseTracker />} />
+          <Route path="/contracts" element={<ContractBuilder />} />
         </Routes>
+        <Footer />
       </main>
     </div>
   )

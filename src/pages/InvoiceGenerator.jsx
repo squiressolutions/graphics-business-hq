@@ -33,8 +33,8 @@ function newLineItem() {
 
 function blankForm() {
   return {
-    yourBusiness: 'Squires Graphics',
-    yourEmail: 'keenansquires@gmail.com',
+    yourBusiness: 'Squires Solutions',
+    yourEmail: 'squiressolutions@gmail.com',
     yourAddress: '',
     clientName: '',
     clientEmail: '',
@@ -69,7 +69,7 @@ function buildPDF(form, lineItems) {
   // Header — business name in gold
   doc.setFontSize(22)
   doc.setTextColor(212, 160, 23)
-  doc.text('SQUIRES GRAPHICS', 14, 20)
+  doc.text('SQUIRES SOLUTIONS', 14, 20)
 
   doc.setFontSize(10)
   doc.setTextColor(80, 80, 80)
