@@ -1090,13 +1090,31 @@ a {
   left: 50%;
   transform: translateX(-50%);
   background: var(--accent);
-  color: #fff;
+  color: #0a0a0a;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 3px 12px;
   border-radius: 20px;
+  white-space: nowrap;
+}
+.pricing-card-badge--badge-cyan {
+  background: var(--accent3);
+  color: #fff;
+}
+
+/* 4-col pricing grid for service tiers */
+.pricing-tiers-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1100px) {
+  .pricing-tiers-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .pricing-tiers-grid { grid-template-columns: 1fr; }
 }
 
 .pricing-tier-name {
@@ -2204,4 +2222,35 @@ a {
   .portal-services-grid { grid-template-columns: 1fr; }
   .portal-progress-label { display: none; }
   .portal-footer-inner { flex-direction: column; gap: 6px; text-align: center; }
+}
+
+/* ── Global: gold asterisks ───────────────────────────────── */
+* {
+  /* asterisk character styled gold globally via CSS counters is not possible;
+     instead target common required-field asterisks */
+}
+.form-label::after,
+label.required::after {
+  color: #F5C518;
+}
+/* explicit gold asterisk class */
+.asterisk, span.req {
+  color: #F5C518;
+  font-weight: 700;
+}
+/* any literal * next to required fields */
+abbr[title="required"] {
+  color: #F5C518;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* ── Mobile bottom padding: client requests ───────────────── */
+@media (max-width: 768px) {
+  .page {
+    padding-bottom: 100px;
+  }
+  .main-content {
+    padding-bottom: 100px;
+  }
 }

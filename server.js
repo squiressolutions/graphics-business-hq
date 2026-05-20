@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import Stripe from 'stripe';
+import nodemailer from 'nodemailer';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
@@ -119,6 +120,76 @@ let submissions = loadSubmissions();
 
 function makeRefNum() {
   return 'REQ-' + String(Date.now()).slice(-6) + Math.random().toString(36).slice(2, 5).toUpperCase();
+}
+
+// ─── Email Notifications ──────────────────────────────────────────────────────
+
+async function sendIntakeNotification(entry) {
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  if (!smtpUser || !smtpPass) return; // silently skip if not configured
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: smtpUser, pass: smtpPass },
+  });
+
+  const isConsult = entry.type === 'consultation';
+  const subject = isConsult
+    ? `📅 New Consultation Request — ${entry.name || 'Unknown'} (${entry.refNum})`
+    : `📥 New Client Request — ${entry.name || 'Unknown'} (${entry.refNum})`;
+
+  const rows = [
+    ['Type',       isConsult ? 'Free Consultation' : 'Project Request'],
+    ['Ref #',      entry.refNum],
+    ['Name',       entry.name || '—'],
+    ['Email',      entry.email || '—'],
+    ['Phone',      entry.phone || '—'],
+    ['Business',   entry.business || '—'],
+    ['Website',    entry.website || '—'],
+    ['Services',   (entry.services || []).join(', ') || '—'],
+    ...(isConsult ? [
+      ['Topic',          entry.topic || '—'],
+      ['Preferred Time', entry.preferredTime || '—'],
+    ] : [
+      ['Budget',   entry.budget || '—'],
+      ['Timeline', entry.timeline || '—'],
+      ['Desc',     entry.description || '—'],
+    ]),
+    ['Found via',  entry.hearAbout || '—'],
+    ['Submitted',  new Date(entry.submittedAt).toLocaleString()],
+  ];
+
+  const tableRows = rows.map(([k, v]) =>
+    `<tr><td style="padding:6px 12px;color:#6888A8;white-space:nowrap;font-weight:600;">${k}</td><td style="padding:6px 12px;color:#EDE8D5;">${v}</td></tr>`
+  ).join('');
+
+  const html = `
+  <div style="background:#050C1A;color:#EDE8D5;font-family:'DM Sans',sans-serif;padding:32px;max-width:640px;margin:0 auto;border-radius:12px;">
+    <div style="font-size:28px;font-weight:800;color:#D4A017;letter-spacing:2px;margin-bottom:4px;">SQUIRES SOLUTIONS</div>
+    <div style="font-size:13px;color:#6888A8;margin-bottom:24px;">squiressolutions@gmail.com</div>
+    <div style="background:#091428;border:1px solid #162945;border-radius:10px;padding:20px;margin-bottom:20px;">
+      <div style="font-size:11px;color:#6888A8;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:10px;">
+        ${isConsult ? '📅 Free Consultation Request' : '📥 New Project Request'}
+      </div>
+      <table style="width:100%;border-collapse:collapse;">${tableRows}</table>
+    </div>
+    <a href="https://graphics-business-hq.onrender.com/client-requests" style="display:inline-block;background:#D4A017;color:#050C1A;font-weight:700;padding:12px 24px;border-radius:8px;text-decoration:none;font-size:14px;">
+      View in Admin →
+    </a>
+    <div style="font-size:11px;color:#6888A8;margin-top:20px;">This notification was sent automatically by your Squires Solutions admin portal.</div>
+  </div>`;
+
+  try {
+    await transporter.sendMail({
+      from: `"Squires Solutions" <${smtpUser}>`,
+      to: 'squiressolutions@gmail.com',
+      subject,
+      html,
+    });
+  } catch (err) {
+    console.warn('[email] Failed to send notification:', err.message);
+  }
 }
 
 // ─── Job Log ──────────────────────────────────────────────────────────────────
@@ -520,6 +591,7 @@ app.post('/api/client-intake', (req, res) => {
 
   submissions.unshift(entry);
   saveSubmissions(submissions);
+  sendIntakeNotification(entry).catch(() => {}); // fire-and-forget
   res.json({ id: entry.id, refNum: entry.refNum });
 });
 

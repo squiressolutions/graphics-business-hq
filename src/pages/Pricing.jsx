@@ -8,7 +8,6 @@ const TIERS = [
     originalPrice: '650',
     period: 'per project',
     badge: null,
-    badgeClass: null,
     description: 'Perfect for solo founders and micro-businesses needing a quick brand refresh.',
     features: [
       { text: 'Logo design (2 concepts)', included: true },
@@ -19,8 +18,6 @@ const TIERS = [
       { text: 'Brand guidelines PDF', included: false },
       { text: 'Source files', included: false },
     ],
-    btnClass: 'btn-ghost',
-    btnLabel: 'Get Started',
   },
   {
     name: 'Studio',
@@ -38,8 +35,6 @@ const TIERS = [
       { text: 'Brand guidelines PDF', included: true },
       { text: 'Source files', included: false },
     ],
-    btnClass: 'btn-primary',
-    btnLabel: 'Start Project',
   },
   {
     name: 'Agency',
@@ -57,8 +52,25 @@ const TIERS = [
       { text: 'Brand guidelines PDF', included: true },
       { text: 'Source files', included: true },
     ],
-    btnClass: 'btn-secondary',
-    btnLabel: 'Contact Us',
+  },
+  {
+    name: 'Website',
+    price: '670',
+    priceSuffix: '+ $40/mo',
+    originalPrice: '900',
+    period: 'upfront',
+    badge: 'New',
+    badgeClass: 'badge-cyan',
+    description: 'Professional website design & development with ongoing monthly support and updates.',
+    features: [
+      { text: 'Custom website design (up to 5 pages)', included: true },
+      { text: 'Mobile responsive layout', included: true },
+      { text: 'SEO-ready structure', included: true },
+      { text: 'Contact form & integrations', included: true },
+      { text: 'Monthly content updates', included: true },
+      { text: 'Hosting & maintenance support', included: true },
+      { text: 'Source files', included: false },
+    ],
   },
 ]
 
@@ -137,15 +149,15 @@ export default function Pricing() {
       {/* ---- Tiers tab ---- */}
       {activeTab === 'tiers' && (
         <div>
-          <div className="grid-3" style={{ alignItems: 'start' }}>
+          <div className="pricing-tiers-grid" style={{ alignItems: 'start' }}>
             {TIERS.map(tier => (
               <div
                 key={tier.name}
-                className={`pricing-card${tier.badge ? ' featured' : ''}`}
+                className={`pricing-card${tier.badge === 'Most Popular' ? ' featured' : ''}`}
                 style={{ position: 'relative' }}
               >
                 {tier.badge && (
-                  <div className="pricing-card-badge">{tier.badge}</div>
+                  <div className={`pricing-card-badge${tier.badgeClass ? ' pricing-card-badge--' + tier.badgeClass : ''}`}>{tier.badge}</div>
                 )}
                 <div>
                   <div className="pricing-tier-name">{tier.name}</div>
@@ -157,7 +169,12 @@ export default function Pricing() {
                       ${tier.originalPrice}
                     </div>
                   )}
-                  <div className="pricing-price"><sup>$</sup>{tier.price}</div>
+                  <div className="pricing-price">
+                    <sup>$</sup>{tier.price}
+                    {tier.priceSuffix && (
+                      <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--accent2)', marginLeft: 4 }}>{tier.priceSuffix}</span>
+                    )}
+                  </div>
                   <div className="pricing-period">{tier.period}</div>
                 </div>
                 <ul className="pricing-features">
@@ -170,44 +187,61 @@ export default function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <button
-                  className={`btn ${tier.btnClass} w-full`}
-                  onClick={() => tier.btnLabel === 'Contact Us'
-                    ? window.location.href = 'mailto:squiressolutions@gmail.com?subject=Agency Package Inquiry'
-                    : window.open('/portal', '_blank')
-                  }
-                >
-                  {tier.btnLabel}
-                </button>
               </div>
             ))}
           </div>
 
           <div className="card" style={{ marginTop: 24 }}>
             <div className="card-header">
-              <div className="card-title">Add-On Services</div>
+              <div className="card-title">Additional Services</div>
             </div>
             <table className="data-table">
               <thead>
                 <tr>
                   <th>Service</th>
+                  <th style={{ minWidth: 200 }}>Description</th>
                   <th>Price</th>
                   <th>Delivery</th>
                 </tr>
               </thead>
               <tbody>
                 {[
-                  { service: 'Brand Strategy Session (2hr)', price: '$299', delivery: 'Scheduled' },
-                  { service: 'Social Media Kit', price: '$399', delivery: '3–5 days' },
-                  { service: 'Motion Logo Animation', price: '$599', delivery: '5–7 days' },
-                  { service: 'Website Mockup (5 pages)', price: '$1,299', delivery: '1–2 weeks' },
-                  { service: 'Brand Photography Direction', price: '$499', delivery: '1 week' },
-                  { service: 'Print / Packaging Design', price: 'From $799', delivery: '1–2 weeks' },
+                  {
+                    service: 'Brand Strategy Session (2hr)',
+                    description: 'Deep-dive into your brand positioning, target audience, and competitive landscape with actionable next steps.',
+                    price: '$299',
+                    delivery: 'Scheduled',
+                  },
+                  {
+                    service: 'Social Media Kit',
+                    description: 'Custom-designed templates and graphics for Instagram, TikTok, and Facebook — ready to post.',
+                    price: '$399',
+                    delivery: '3–5 days',
+                  },
+                  {
+                    service: 'Website Mockup',
+                    description: 'Visual preview of your site layout and design before development begins — up to 3 pages.',
+                    price: '$400',
+                    delivery: '5–7 days',
+                  },
+                  {
+                    service: 'Print & Packaging Design',
+                    description: 'Business cards, flyers, brochures, product packaging, and signage designed for print-ready output.',
+                    price: 'From $799',
+                    delivery: '1–2 weeks',
+                  },
+                  {
+                    service: 'Ad Creative Bundle',
+                    description: 'High-converting graphics and copy for Meta, TikTok, and Google ads — tested formats and hooks included.',
+                    price: '$299',
+                    delivery: '3–5 days',
+                  },
                 ].map((row, i) => (
                   <tr key={i}>
-                    <td>{row.service}</td>
+                    <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{row.service}</td>
+                    <td className="text-muted" style={{ fontSize: 12, lineHeight: 1.5 }}>{row.description}</td>
                     <td><span className="badge badge-violet">{row.price}</span></td>
-                    <td className="text-muted">{row.delivery}</td>
+                    <td className="text-muted" style={{ whiteSpace: 'nowrap' }}>{row.delivery}</td>
                   </tr>
                 ))}
               </tbody>

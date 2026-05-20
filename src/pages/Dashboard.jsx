@@ -83,6 +83,7 @@ export default function Dashboard() {
   const [jobsLoading, setJobsLoading] = useState(true)
   const [autopilot, setAutopilot] = useState({ enabled: false })
   const [autopilotToggling, setAutopilotToggling] = useState(false)
+  const [expandedJob, setExpandedJob] = useState(null)
 
   useEffect(() => {
     fetch('/api/jobs')
@@ -187,18 +188,68 @@ export default function Dashboard() {
         {!jobsLoading && jobs.length === 0 && (
           <p className="text-muted" style={{ padding: '8px 0' }}>No jobs yet. Run an agent to get started.</p>
         )}
-        {!jobsLoading && jobs.length > 0 && jobs.map(job => (
-          <div key={job.id} className="job-row">
-            <span className={`status-dot ${statusDotClass[job.status] || ''}`} />
-            <span className="job-row-label">{job.agent}</span>
-            <span className="job-row-time">{formatTime(job.startedAt)}</span>
-            <div className="job-row-status">
-              <span className={`badge ${job.status === 'done' ? 'badge-green' : job.status === 'running' ? 'badge-orange' : 'badge-muted'}`}>
-                {job.status}
-              </span>
+        {!jobsLoading && jobs.length > 0 && jobs.map(job => {
+          const isExp = expandedJob === job.id
+          let parsedOutput = null
+          if (isExp && job.output) {
+            try {
+              const m = job.output.match(/```(?:json)?\s*([\s\S]*?)```/) || job.output.match(/(\{[\s\S]*\}|\[[\s\S]*\])/)
+              if (m) parsedOutput = JSON.parse(m[1] || m[0])
+            } catch {}
+          }
+          return (
+            <div key={job.id}>
+              <div
+                className="job-row"
+                style={{ cursor: 'pointer', userSelect: 'none' }}
+                onClick={() => setExpandedJob(isExp ? null : job.id)}
+              >
+                <span className={`status-dot ${statusDotClass[job.status] || ''}`} />
+                <span className="job-row-label">{job.agentName || job.agent}</span>
+                <span className="job-row-time">{formatTime(job.startedAt)}</span>
+                <div className="job-row-status" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span className={`badge ${job.status === 'done' ? 'badge-green' : job.status === 'running' ? 'badge-orange' : 'badge-muted'}`}>
+                    {job.status}
+                  </span>
+                  <span style={{ color: 'var(--muted)', fontSize: 13 }}>{isExp ? '▲' : '▼'}</span>
+                </div>
+              </div>
+              {isExp && (
+                <div style={{ background: 'var(--bg3)', borderTop: '1px solid var(--border)', padding: '16px 20px', fontSize: 12 }}>
+                  <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 12 }}>
+                    <div><span style={{ color: 'var(--muted)', fontWeight: 600 }}>Job ID:</span> <span style={{ color: 'var(--muted2)', fontFamily: 'monospace' }}>{job.id}</span></div>
+                    <div><span style={{ color: 'var(--muted)', fontWeight: 600 }}>Agent:</span> <span style={{ color: 'var(--text)' }}>{job.agentName}</span></div>
+                    <div><span style={{ color: 'var(--muted)', fontWeight: 600 }}>Started:</span> <span style={{ color: 'var(--text)' }}>{formatTime(job.startedAt)}</span></div>
+                    {job.finishedAt && <div><span style={{ color: 'var(--muted)', fontWeight: 600 }}>Finished:</span> <span style={{ color: 'var(--text)' }}>{formatTime(job.finishedAt)}</span></div>}
+                    <div><span style={{ color: 'var(--muted)', fontWeight: 600 }}>Status:</span> <span className={`badge ${job.status === 'done' ? 'badge-green' : job.status === 'running' ? 'badge-orange' : 'badge-muted'}`}>{job.status}</span></div>
+                  </div>
+                  {job.error && (
+                    <div style={{ background: 'rgba(229,90,90,0.08)', border: '1px solid rgba(229,90,90,0.2)', borderRadius: 6, padding: '10px 14px', color: 'var(--red)', marginBottom: 10, fontSize: 12 }}>
+                      <strong>Error:</strong> {job.error}
+                    </div>
+                  )}
+                  {job.input && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ color: 'var(--muted)', fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', fontSize: 10, marginBottom: 6 }}>Input Prompt</div>
+                      <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 14px', color: 'var(--muted2)', whiteSpace: 'pre-wrap', maxHeight: 120, overflowY: 'auto', lineHeight: 1.6 }}>
+                        {job.input.slice(0, 400)}{job.input.length > 400 ? '…' : ''}
+                      </div>
+                    </div>
+                  )}
+                  {parsedOutput && (
+                    <div>
+                      <div style={{ color: 'var(--muted)', fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', fontSize: 10, marginBottom: 6 }}>Output Preview</div>
+                      <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 14px', color: 'var(--accent2)', whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 11, maxHeight: 160, overflowY: 'auto', lineHeight: 1.6 }}>
+                        {JSON.stringify(parsedOutput, null, 2).slice(0, 800)}
+                        {JSON.stringify(parsedOutput, null, 2).length > 800 ? '\n…' : ''}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Autopilot */}

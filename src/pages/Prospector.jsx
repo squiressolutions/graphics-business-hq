@@ -5,9 +5,9 @@ const SERVICE_OPTIONS = [
   'Brand Identity',
   'Social Media Graphics',
   'Website Design',
-  'Motion Graphics',
   'Full-Service Branding',
   'Print Design',
+  'Ad Creative',
 ];
 
 const BUDGET_OPTIONS = [
