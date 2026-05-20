@@ -2019,6 +2019,9 @@ a {
 }
 
 .portal-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 10px 22px;
   border-radius: 8px;
   font-size: 14px;

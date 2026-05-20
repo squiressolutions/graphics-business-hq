@@ -1,16 +1,22 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import {
+  ShoppingBag, ClipboardList, CreditCard,
+  Palette, PenTool, Share2, Monitor, Package,
+  Megaphone, Play, RefreshCw, Lock, CheckCircle,
+  Mail, ArrowRight, ChevronLeft,
+} from 'lucide-react'
 
 // ── Static service data (mirrors server catalog) ──────────────────────────────
 const SERVICES_INTAKE = [
-  { id: 'brand-identity',   icon: '◈', title: 'Brand Identity',     desc: 'Full brand system — logo, colors, typography, guidelines', from: 'From $1,197' },
-  { id: 'logo-design',      icon: '◆', title: 'Logo Design',         desc: 'Professional logo concepts with revisions & source files',  from: 'From $497'   },
-  { id: 'social-media-kit', icon: '◉', title: 'Social Media Kit',    desc: 'Templates & graphics for Instagram, TikTok, Facebook',     from: 'From $399'   },
-  { id: 'website-design',   icon: '◻', title: 'Website Design',      desc: 'UI/UX mockups, landing pages & full site designs',          from: 'From $1,299' },
-  { id: 'print-design',     icon: '◇', title: 'Print & Packaging',   desc: 'Business cards, flyers, packaging, signage & more',         from: 'From $799'   },
-  { id: 'ad-creative',      icon: '▣', title: 'Ad Creative',         desc: 'Meta, TikTok & Google ad graphics and copy',                from: 'From $299'   },
-  { id: 'motion-graphics',  icon: '▷', title: 'Motion Graphics',     desc: 'Animated logos, video intros, reels & short-form content',  from: 'From $599'   },
-  { id: 'full-rebrand',     icon: '↻', title: 'Full Rebrand',        desc: 'Complete overhaul — strategy, identity, collateral & rollout', from: 'From $3,697' },
+  { id: 'brand-identity',   Icon: Palette,    title: 'Brand Identity',     desc: 'Full brand system — logo, colors, typography, guidelines', from: 'From $1,197' },
+  { id: 'logo-design',      Icon: PenTool,    title: 'Logo Design',         desc: 'Professional logo concepts with revisions & source files',  from: 'From $497'   },
+  { id: 'social-media-kit', Icon: Share2,     title: 'Social Media Kit',    desc: 'Templates & graphics for Instagram, TikTok, Facebook',     from: 'From $399'   },
+  { id: 'website-design',   Icon: Monitor,    title: 'Website Design',      desc: 'UI/UX mockups, landing pages & full site designs',          from: 'From $1,299' },
+  { id: 'print-design',     Icon: Package,    title: 'Print & Packaging',   desc: 'Business cards, flyers, packaging, signage & more',         from: 'From $799'   },
+  { id: 'ad-creative',      Icon: Megaphone,  title: 'Ad Creative',         desc: 'Meta, TikTok & Google ad graphics and copy',                from: 'From $299'   },
+  { id: 'motion-graphics',  Icon: Play,       title: 'Motion Graphics',     desc: 'Animated logos, video intros, reels & short-form content',  from: 'From $599'   },
+  { id: 'full-rebrand',     Icon: RefreshCw,  title: 'Full Rebrand',        desc: 'Complete overhaul — strategy, identity, collateral & rollout', from: 'From $3,697' },
 ]
 
 const BUDGETS    = ['Under $500','$500 – $1,000','$1,000 – $2,500','$2,500 – $5,000','$5,000 – $10,000','$10,000+','Not sure yet']
@@ -141,9 +147,15 @@ export default function ClientPortal() {
       <div className="portal-body">
         {/* ── Tab row ── */}
         <div className="portal-tab-row">
-          <button className={`portal-tab ${tab==='services'?'active':''}`} onClick={() => setTab('services')}>🛍 Services & Pricing</button>
-          <button className={`portal-tab ${tab==='intake'?'active':''}`}   onClick={() => setTab('intake')}>📋 Request a Project</button>
-          <button className={`portal-tab ${tab==='pay'?'active':''}`}      onClick={() => setTab('pay')}>💳 Pay an Invoice</button>
+          <button className={`portal-tab ${tab==='services'?'active':''}`} onClick={() => setTab('services')}>
+            <ShoppingBag size={15} strokeWidth={1.75} /> Services & Pricing
+          </button>
+          <button className={`portal-tab ${tab==='intake'?'active':''}`} onClick={() => setTab('intake')}>
+            <ClipboardList size={15} strokeWidth={1.75} /> Request a Project
+          </button>
+          <button className={`portal-tab ${tab==='pay'?'active':''}`} onClick={() => setTab('pay')}>
+            <CreditCard size={15} strokeWidth={1.75} /> Pay an Invoice
+          </button>
         </div>
 
         {/* ══════════════════ SERVICES TAB ══════════════════ */}
@@ -152,7 +164,7 @@ export default function ClientPortal() {
             {/* Payment success banner */}
             {paymentStatus === 'success' && (
               <div className="portal-pay-success" style={{ marginBottom: 24 }}>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>✅</div>
+                <CheckCircle size={32} color="#3DD68C" style={{ marginBottom: 6 }} />
                 <div style={{ fontWeight: 700, color: '#3DD68C', fontSize: 15 }}>Payment Successful!</div>
                 {paidService && catalog.find(s=>s.id===paidService) && (
                   <div style={{ fontSize: 13, color: 'var(--muted2)', marginTop: 4 }}>
@@ -257,7 +269,7 @@ export default function ClientPortal() {
           <div className="portal-card" style={{ maxWidth: 520, margin: '0 auto' }}>
             {paymentStatus === 'success' && (
               <div className="portal-pay-success" style={{ marginBottom: 24 }}>
-                <div style={{ fontSize: 28 }}>✅</div>
+                <CheckCircle size={32} color="#3DD68C" />
                 <div style={{ fontWeight:700, color:'#3DD68C', marginTop:6 }}>Payment Successful!</div>
                 <div style={{ fontSize:13, color:'var(--muted2)', marginTop:4 }}>Thank you — we'll be in touch shortly.</div>
               </div>
@@ -303,11 +315,11 @@ export default function ClientPortal() {
               <button type="submit" className="portal-btn portal-btn-primary"
                 style={{ width:'100%', justifyContent:'center', marginTop:8 }}
                 disabled={paying || stripeConfigured === false}>
-                {paying ? <><span className="portal-spinner" /> Redirecting…</> : '💳 Pay Now via Stripe'}
+                {paying ? <><span className="portal-spinner" /> Redirecting…</> : <><CreditCard size={15} style={{marginRight:6}} /> Pay Now via Stripe</>}
               </button>
             </form>
-            <div style={{ marginTop:20, textAlign:'center', fontSize:12, color:'var(--muted)' }}>
-              🔒 Secured by Stripe · We never store your card details
+            <div style={{ marginTop:20, textAlign:'center', fontSize:12, color:'var(--muted)', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+              <Lock size={12} /> Secured by Stripe · We never store your card details
             </div>
           </div>
         )}
@@ -326,7 +338,11 @@ export default function ClientPortal() {
                   </p>
                   {refNum && <div className="portal-ref">Reference: <span>{refNum}</span></div>}
                   <div className="portal-success-services">
-                    {selectedServices.map(s => <span key={s.id} className="portal-tag">{s.icon} {s.title}</span>)}
+                    {selectedServices.map(s => (
+                      <span key={s.id} className="portal-tag">
+                        <s.Icon size={12} strokeWidth={1.75} style={{marginRight:4}} />{s.title}
+                      </span>
+                    ))}
                   </div>
                   <button className="portal-btn portal-btn-ghost" style={{ marginTop:24 }}
                     onClick={() => { setSubmitted(false); setStep(1); setServices([]); setProject(blankProject()); setContact(blankContact()) }}>
@@ -356,8 +372,8 @@ export default function ClientPortal() {
                         <button key={s.id} type="button"
                           className={`portal-service-card ${services.includes(s.id)?'selected':''}`}
                           onClick={() => toggleService(s.id)}>
-                          <div className="portal-service-check">{services.includes(s.id)?'✓':''}</div>
-                          <div className="portal-service-icon">{s.icon}</div>
+                          <div className="portal-service-check">{services.includes(s.id) ? '✓' : ''}</div>
+                          <div className="portal-service-icon"><s.Icon size={22} strokeWidth={1.5} /></div>
                           <div className="portal-service-title">{s.title}</div>
                           <div className="portal-service-desc">{s.desc}</div>
                           <div className="portal-service-price">{s.from}</div>
@@ -472,7 +488,11 @@ export default function ClientPortal() {
                     <div className="portal-review-section">
                       <div className="portal-review-label">Services</div>
                       <div className="portal-tag-row">
-                        {selectedServices.map(s => <span key={s.id} className="portal-tag">{s.icon} {s.title}</span>)}
+                        {selectedServices.map(s => (
+                          <span key={s.id} className="portal-tag">
+                            <s.Icon size={12} strokeWidth={1.75} style={{marginRight:4}} />{s.title}
+                          </span>
+                        ))}
                       </div>
                     </div>
                     <div className="portal-review-section">
@@ -534,7 +554,7 @@ function PortalHeader() {
           </div>
         </a>
         <a href="mailto:squiressolutions@gmail.com" className="portal-contact-link">
-          squiressolutions@gmail.com
+          <Mail size={14} strokeWidth={1.75} style={{marginRight:6}} />squiressolutions@gmail.com
         </a>
       </div>
     </header>
