@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import jsPDF from 'jspdf'
 
 const INITIAL = {
   clientName: '',
@@ -38,6 +39,45 @@ export default function ClientBrief() {
     } finally {
       setLoading(false)
     }
+  }
+
+  function exportBriefPDF(result, form) {
+    const doc = new jsPDF()
+    const margin = 16
+    const maxW = doc.internal.pageSize.getWidth() - margin * 2
+    let y = 18
+
+    doc.setFontSize(18); doc.setTextColor(123, 97, 255)
+    doc.text('SQUIRES SOLUTIONS — PROJECT BRIEF', margin, y); y += 10
+    doc.setFontSize(10); doc.setTextColor(80, 80, 80)
+    doc.text(`Client: ${form.clientName}  |  Type: ${form.projectType}  |  Budget: ${form.budgetRange}  |  Timeline: ${form.timeline}`, margin, y); y += 10
+
+    const sections = [
+      { title: 'Project Title', body: result.projectTitle || '' },
+      { title: 'Client Overview', body: result.clientOverview || '' },
+      { title: 'Objectives', body: (result.objectives || []).map((o, i) => `${i + 1}. ${o}`).join('\n') },
+      { title: 'Deliverables', body: (result.deliverables || []).map(d => `• ${d}`).join('\n') },
+      { title: 'Project Scope', body: result.projectScope || '' },
+      { title: 'Out of Scope', body: (result.outOfScope || []).map(d => `• ${d}`).join('\n') },
+      { title: 'Timeline', body: (result.milestones || []).map(m => `${m.name}: ${m.description}`).join('\n') },
+      { title: 'Budget', body: result.budget || '' },
+      { title: 'Revision Policy', body: result.revisionPolicy || '' },
+    ].filter(s => s.body)
+
+    sections.forEach(({ title, body }) => {
+      if (y > 260) { doc.addPage(); y = 20 }
+      doc.setFontSize(11); doc.setTextColor(40, 40, 40); doc.setFont('helvetica', 'bold')
+      doc.text(title.toUpperCase(), margin, y); y += 6
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(60, 60, 60)
+      const lines = doc.splitTextToSize(body, maxW)
+      lines.forEach(line => {
+        if (y > 270) { doc.addPage(); y = 20 }
+        doc.text(line, margin, y); y += 5
+      })
+      y += 5
+    })
+
+    doc.save(`brief-${(form.clientName || 'client').replace(/\s+/g, '-').toLowerCase()}.pdf`)
   }
 
   return (
@@ -118,6 +158,11 @@ export default function ClientBrief() {
 
       {result && !loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Action bar */}
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button className="btn btn-primary" onClick={() => exportBriefPDF(result, form)}>↓ Export PDF</button>
+          </div>
+
           {/* Header */}
           <div className="card">
             <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>

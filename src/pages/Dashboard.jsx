@@ -50,6 +50,22 @@ const AGENTS = [
     badgeClass: 'badge-cyan',
     icon: '◎',
   },
+  {
+    name: 'Prospector',
+    route: '/prospector',
+    description: 'Find ideal clients and generate outreach sequences.',
+    badge: 'Sales',
+    badgeClass: 'badge-orange',
+    icon: '🎯',
+  },
+  {
+    name: 'Campaign Builder',
+    route: '/campaign',
+    description: 'Build full ad campaigns with copy, creatives, and strategy.',
+    badge: 'Marketing',
+    badgeClass: 'badge-pink',
+    icon: '📊',
+  },
 ]
 
 function formatTime(iso) {
@@ -120,7 +136,7 @@ export default function Dashboard() {
         </div>
         <div className="stat-card stat-card-pink">
           <div className="card-label">Active Agents</div>
-          <div className="card-value">6</div>
+          <div className="card-value">8</div>
           <div className="card-muted">ready to run</div>
         </div>
         <div className="stat-card stat-card-cyan">
@@ -143,7 +159,7 @@ export default function Dashboard() {
       <div className="card" style={{ marginBottom: 24 }}>
         <div className="card-header">
           <div className="card-title">Agents</div>
-          <span className="badge badge-muted">6 active</span>
+          <span className="badge badge-muted">8 active</span>
         </div>
         <div className="action-grid">
           {AGENTS.map(agent => (

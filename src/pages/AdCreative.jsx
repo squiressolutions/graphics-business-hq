@@ -165,11 +165,11 @@ export default function AdCreative() {
           )}
 
           {/* Copy angles */}
-          {result.copyAngles && result.copyAngles.length > 0 && (
+          {(result.copyAngles || result.copywritingAngles) && (result.copyAngles || result.copywritingAngles).length > 0 && (
             <div className="card">
               <div className="card-label" style={{ marginBottom: 14 }}>Copy Angles</div>
               <div className="pill-group">
-                {result.copyAngles.map((angle, i) => (
+                {(result.copyAngles || result.copywritingAngles).map((angle, i) => (
                   <span key={i} className={`badge ${ANGLE_BADGES[i % ANGLE_BADGES.length]}`} style={{ fontSize: 12, padding: '5px 14px' }}>
                     {angle}
                   </span>

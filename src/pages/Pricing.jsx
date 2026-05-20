@@ -304,11 +304,20 @@ export default function Pricing() {
                   <div className="card" style={{ borderLeft: '3px solid var(--accent)' }}>
                     <div className="card-label" style={{ marginBottom: 8 }}>Recommended Price</div>
                     <div className="card-value" style={{ color: 'var(--accent)' }}>
-                      {result.recommendedPrice || result.price || '—'}
+                      {result.recommendedPrice
+                        ? (typeof result.recommendedPrice === 'number'
+                          ? `$${result.recommendedPrice.toLocaleString()}`
+                          : result.recommendedPrice)
+                        : result.price || '—'}
                     </div>
-                    {result.priceRationale && (
+                    {(result.priceRationale || result.notes) && (
                       <p className="text-muted2" style={{ fontSize: 12, marginTop: 8, lineHeight: 1.6 }}>
-                        {result.priceRationale}
+                        {result.priceRationale || result.notes}
+                      </p>
+                    )}
+                    {result.priceRange && (
+                      <p className="text-muted" style={{ fontSize: 11, marginTop: 4 }}>
+                        Range: ${(result.priceRange.low || result.priceRange.min || 0).toLocaleString()} – ${(result.priceRange.high || result.priceRange.max || 0).toLocaleString()}
                       </p>
                     )}
                   </div>
@@ -317,29 +326,43 @@ export default function Pricing() {
                     <div className="result-block">{result.proposalText}</div>
                   )}
 
-                  {result.lineItems && result.lineItems.length > 0 && (
+                  {(result.lineItems || result.breakdown) && (result.lineItems || result.breakdown).length > 0 && (
                     <div className="card">
-                      <div className="card-label" style={{ marginBottom: 14 }}>Line Items</div>
+                      <div className="card-label" style={{ marginBottom: 14 }}>Breakdown</div>
                       <table className="data-table">
                         <thead>
                           <tr><th>Item</th><th>Price</th></tr>
                         </thead>
                         <tbody>
-                          {result.lineItems.map((item, i) => (
-                            <tr key={i}>
-                              <td>{item.description || item.item}</td>
-                              <td><span className="badge badge-green">{item.price}</span></td>
+                          {(result.lineItems || result.breakdown).map((item, i) => {
+                            const label = item.description || item.item || item.name || '—'
+                            const price = item.price != null
+                              ? (typeof item.price === 'number' ? `$${item.price.toLocaleString()}` : item.price)
+                              : item.total != null
+                                ? `$${Number(item.total).toLocaleString()}`
+                                : '—'
+                            return (
+                              <tr key={i}>
+                                <td>{label}</td>
+                                <td><span className="badge badge-green">{price}</span></td>
+                              </tr>
+                            )
+                          })}
+                          {result.breakdown_total != null && (
+                            <tr style={{ fontWeight: 700 }}>
+                              <td>Total</td>
+                              <td><span className="badge badge-violet">${Number(result.breakdown_total).toLocaleString()}</span></td>
                             </tr>
-                          ))}
+                          )}
                         </tbody>
                       </table>
                     </div>
                   )}
 
-                  {result.terms && (
+                  {(result.terms || result.paymentStructure) && (
                     <div className="card">
-                      <div className="card-label" style={{ marginBottom: 10 }}>Terms</div>
-                      <p className="text-muted2" style={{ fontSize: 13, lineHeight: 1.7 }}>{result.terms}</p>
+                      <div className="card-label" style={{ marginBottom: 10 }}>Payment Terms</div>
+                      <p className="text-muted2" style={{ fontSize: 13, lineHeight: 1.7 }}>{result.terms || result.paymentStructure}</p>
                     </div>
                   )}
                 </div>
