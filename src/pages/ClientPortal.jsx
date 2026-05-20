@@ -158,6 +158,20 @@ export default function ClientPortal() {
           </button>
         </div>
 
+        {/* ══════════════════ FREE CONSULTATION BANNER ══════════════════ */}
+        <div className="portal-consult-banner">
+          <div className="portal-consult-text">
+            <div className="portal-consult-title">Not sure where to start?</div>
+            <div className="portal-consult-sub">Book a free 30-min consultation — no commitment, no pressure.</div>
+          </div>
+          <a
+            href="mailto:squiressolutions@gmail.com?subject=Free Consultation Request&body=Hi, I'd like to book a free consultation to discuss my project."
+            className="portal-consult-btn"
+          >
+            <Mail size={15} strokeWidth={1.75} /> Book Free Consultation
+          </a>
+        </div>
+
         {/* ══════════════════ SERVICES TAB ══════════════════ */}
         {tab === 'services' && (
           <div>
@@ -226,7 +240,12 @@ export default function ClientPortal() {
                       )}
                       <div className="portal-catalog-name">{svc.name}</div>
                       <div className="portal-catalog-desc">{svc.description}</div>
-                      <div className="portal-catalog-price">{fmt(svc.price)}</div>
+                      <div className="portal-catalog-pricing">
+                        {svc.originalPrice && (
+                          <div className="portal-catalog-original">{fmt(svc.originalPrice)}</div>
+                        )}
+                        <div className="portal-catalog-price">{fmt(svc.price)}</div>
+                      </div>
                       <div style={{ display:'flex', gap:8, marginTop:'auto', paddingTop:16 }}>
                         {stripeConfigured ? (
                           <button
