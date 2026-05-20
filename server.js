@@ -30,6 +30,28 @@ function getStripe() {
   return _stripe;
 }
 
+// ─── Service Catalog (used by Stripe + portal) ────────────────────────────────
+
+export const SERVICE_CATALOG = [
+  // ── Packages ──────────────────────────────────────────────────────────────
+  { id: 'starter',       name: 'Starter Package',      price: 49700,  category: 'package',  description: 'Logo design (2 concepts), brand color palette, typography, 2 revision rounds.' },
+  { id: 'studio',        name: 'Studio Package',        price: 119700, category: 'package',  description: 'Logo (3 concepts), color palette, typography, social media kit, brand guidelines PDF, 4 revision rounds.' },
+  { id: 'agency',        name: 'Agency Package',        price: 369700, category: 'package',  description: 'Logo (5 concepts), full brand identity, social kit, guidelines, source files, unlimited revisions.' },
+  // ── À la carte services ───────────────────────────────────────────────────
+  { id: 'brand-identity',   name: 'Brand Identity',       price: 119700, category: 'service', description: 'Full brand system — logo, colors, typography, guidelines.' },
+  { id: 'logo-design',      name: 'Logo Design',           price: 49700,  category: 'service', description: 'Professional logo concepts with revisions & source files.' },
+  { id: 'social-media-kit', name: 'Social Media Kit',      price: 39900,  category: 'service', description: 'Templates & graphics for Instagram, TikTok, Facebook.' },
+  { id: 'website-design',   name: 'Website Design',        price: 129900, category: 'service', description: 'UI/UX mockups, landing pages & full site designs (up to 5 pages).' },
+  { id: 'print-design',     name: 'Print & Packaging',     price: 79900,  category: 'service', description: 'Business cards, flyers, packaging, signage & more.' },
+  { id: 'ad-creative',      name: 'Ad Creative',           price: 29900,  category: 'service', description: 'Meta, TikTok & Google ad graphics and copy.' },
+  { id: 'motion-graphics',  name: 'Motion Graphics',       price: 59900,  category: 'service', description: 'Animated logos, video intros, reels & short-form content.' },
+  { id: 'full-rebrand',     name: 'Full Rebrand',          price: 369700, category: 'service', description: 'Complete overhaul — strategy, identity, collateral & rollout.' },
+  // ── Add-ons ───────────────────────────────────────────────────────────────
+  { id: 'brand-strategy',   name: 'Brand Strategy Session (2hr)', price: 29900, category: 'addon', description: '2-hour deep-dive brand strategy session.' },
+  { id: 'logo-animation',   name: 'Motion Logo Animation',        price: 59900, category: 'addon', description: 'Professional animated version of your logo.' },
+  { id: 'photo-direction',  name: 'Brand Photography Direction',  price: 49900, category: 'addon', description: 'Art direction for brand photo shoot.' },
+];
+
 // ─── Agent Definitions ────────────────────────────────────────────────────────
 
 const AGENTS = {
@@ -569,11 +591,55 @@ Write in formal but clear legal language. Include date and signature blocks at t
 
 // ─── Stripe Checkout ──────────────────────────────────────────────────────────
 
-app.post('/api/create-checkout-session', async (req, res) => {
-  const { amount, description, clientEmail, invoiceNumber } = req.body;
+const appUrl = () => process.env.APP_URL || `http://localhost:${process.env.PORT || 3001}`;
+
+// Return catalog to frontend
+app.get('/api/services', (_req, res) => {
+  res.json(SERVICE_CATALOG);
+});
+
+app.get('/api/stripe-status', (_req, res) => {
+  res.json({ configured: !!process.env.STRIPE_SECRET_KEY });
+});
+
+// Buy a specific service by catalog ID
+app.post('/api/checkout/service', async (req, res) => {
+  const { serviceId, clientEmail, quantity = 1 } = req.body;
+  const service = SERVICE_CATALOG.find(s => s.id === serviceId);
+  if (!service) return res.status(400).json({ error: 'Unknown service ID.' });
   try {
     const stripe = getStripe();
-    const appUrl = process.env.APP_URL || `http://localhost:${process.env.PORT || 3001}`;
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `${service.name} — Squires Solutions`,
+            description: service.description,
+          },
+          unit_amount: service.price,
+        },
+        quantity,
+      }],
+      mode: 'payment',
+      customer_email: clientEmail || undefined,
+      success_url: `${appUrl()}/portal?payment=success&service=${serviceId}`,
+      cancel_url: `${appUrl()}/portal?payment=cancelled`,
+      metadata: { serviceId, serviceName: service.name },
+    });
+    res.json({ url: session.url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Pay a specific invoice by number + custom amount
+app.post('/api/checkout/invoice', async (req, res) => {
+  const { amount, invoiceNumber, clientEmail, description } = req.body;
+  if (!amount || isNaN(parseFloat(amount))) return res.status(400).json({ error: 'Valid amount required.' });
+  try {
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
@@ -589,8 +655,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
       }],
       mode: 'payment',
       customer_email: clientEmail || undefined,
-      success_url: `${appUrl}/portal?payment=success&inv=${invoiceNumber || ''}`,
-      cancel_url: `${appUrl}/portal?payment=cancelled`,
+      success_url: `${appUrl()}/portal?payment=success&inv=${invoiceNumber || ''}`,
+      cancel_url: `${appUrl()}/portal?payment=cancelled`,
       metadata: { invoiceNumber: invoiceNumber || '', clientEmail: clientEmail || '' },
     });
     res.json({ url: session.url });
@@ -599,8 +665,29 @@ app.post('/api/create-checkout-session', async (req, res) => {
   }
 });
 
-app.get('/api/stripe-status', (_req, res) => {
-  res.json({ configured: !!process.env.STRIPE_SECRET_KEY });
+// One-time: push all products to Stripe dashboard
+app.post('/api/stripe/setup-products', async (req, res) => {
+  try {
+    const stripe = getStripe();
+    const results = [];
+    for (const svc of SERVICE_CATALOG) {
+      const product = await stripe.products.create({
+        name: svc.name,
+        description: svc.description,
+        metadata: { squires_id: svc.id, category: svc.category },
+      });
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: svc.price,
+        currency: 'usd',
+        metadata: { squires_id: svc.id },
+      });
+      results.push({ name: svc.name, productId: product.id, priceId: price.id, amount: `$${(svc.price/100).toFixed(2)}` });
+    }
+    res.json({ created: results.length, products: results });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ─── Static / SPA ─────────────────────────────────────────────────────────────

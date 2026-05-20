@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
-const SERVICES = [
+// ── Static service data (mirrors server catalog) ──────────────────────────────
+const SERVICES_INTAKE = [
   { id: 'brand-identity',   icon: '◈', title: 'Brand Identity',     desc: 'Full brand system — logo, colors, typography, guidelines', from: 'From $1,197' },
   { id: 'logo-design',      icon: '◆', title: 'Logo Design',         desc: 'Professional logo concepts with revisions & source files',  from: 'From $497'   },
   { id: 'social-media-kit', icon: '◉', title: 'Social Media Kit',    desc: 'Templates & graphics for Instagram, TikTok, Facebook',     from: 'From $399'   },
@@ -12,48 +13,98 @@ const SERVICES = [
   { id: 'full-rebrand',     icon: '↻', title: 'Full Rebrand',        desc: 'Complete overhaul — strategy, identity, collateral & rollout', from: 'From $3,697' },
 ]
 
-const BUDGETS   = ['Under $500','$500 – $1,000','$1,000 – $2,500','$2,500 – $5,000','$5,000 – $10,000','$10,000+','Not sure yet']
-const TIMELINES = ['ASAP (rush)','1 – 2 weeks','2 – 4 weeks','1 – 2 months','2 – 3 months','Flexible']
+const BUDGETS    = ['Under $500','$500 – $1,000','$1,000 – $2,500','$2,500 – $5,000','$5,000 – $10,000','$10,000+','Not sure yet']
+const TIMELINES  = ['ASAP (rush)','1 – 2 weeks','2 – 4 weeks','1 – 2 months','2 – 3 months','Flexible']
 const HEAR_ABOUT = ['Google Search','Instagram','TikTok','Referral / Word of mouth','LinkedIn','Other']
 
+function fmt(cents) { return '$' + (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0 }) }
 function blankContact() { return { name:'', business:'', email:'', phone:'', website:'' } }
 function blankProject() { return { budget:'', timeline:'', description:'', inspiration:'', hearAbout:'' } }
 
+// ── Category config ────────────────────────────────────────────────────────────
+const CAT = {
+  package: { label: 'Packages',          color: 'var(--accent)',  badge: 'Best Value' },
+  service: { label: 'À La Carte Services', color: 'var(--accent3)', badge: null },
+  addon:   { label: 'Add-Ons',            color: 'var(--green)',   badge: null },
+}
+
 export default function ClientPortal() {
   const [searchParams] = useSearchParams()
-  const [tab, setTab]  = useState('intake') // 'intake' | 'pay'
+  const paymentStatus  = searchParams.get('payment')
+  const paidService    = searchParams.get('service')
 
-  // Handle Stripe redirect back
-  const paymentStatus = searchParams.get('payment')
+  const [tab, setTab] = useState(paymentStatus ? 'pay' : 'services')
 
-  // ── Intake state ──────────────────────────────────────────────
-  const [step, setStep]           = useState(1)
-  const [services, setServices]   = useState([])
-  const [project, setProject]     = useState(blankProject())
-  const [contact, setContact]     = useState(blankContact())
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [refNum, setRefNum]       = useState('')
-  const [intakeError, setIntakeError] = useState(null)
-
-  // ── Payment state ─────────────────────────────────────────────
+  // ── Services catalog from API ──────────────────────────────────────────────
+  const [catalog, setCatalog]                 = useState([])
   const [stripeConfigured, setStripeConfigured] = useState(null)
-  const [pay, setPay] = useState({ invoiceNumber:'', amount:'', email:'', description:'' })
-  const [paying, setPaying] = useState(false)
-  const [payError, setPayError] = useState(null)
+  const [checkoutLoading, setCheckoutLoading] = useState(null)
+  const [checkoutError, setCheckoutError]     = useState(null)
+  const [buyEmail, setBuyEmail]               = useState('')
+  const [showEmailFor, setShowEmailFor]       = useState(null)
 
   useEffect(() => {
+    fetch('/api/services').then(r => r.json()).then(setCatalog).catch(() => setCatalog([]))
     fetch('/api/stripe-status').then(r => r.json()).then(d => setStripeConfigured(d.configured)).catch(() => setStripeConfigured(false))
-    if (paymentStatus === 'success') setTab('pay')
-  }, [paymentStatus])
+  }, [])
 
-  function toggleService(id) {
-    setServices(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
+  async function buyService(serviceId) {
+    setCheckoutLoading(serviceId)
+    setCheckoutError(null)
+    try {
+      const res = await fetch('/api/checkout/service', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serviceId, clientEmail: buyEmail }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Checkout failed.')
+      window.location.href = data.url
+    } catch (err) {
+      setCheckoutError(err.message)
+    } finally {
+      setCheckoutLoading(null)
+    }
   }
 
+  // ── Invoice pay state ──────────────────────────────────────────────────────
+  const [pay, setPay]     = useState({ invoiceNumber:'', amount:'', email:'', description:'' })
+  const [paying, setPaying] = useState(false)
+  const [payError, setPayError] = useState(null)
+  function payChange(e) { const {name,value}=e.target; setPay(p=>({...p,[name]:value})) }
+
+  async function startPayment(e) {
+    e.preventDefault()
+    setPaying(true); setPayError(null)
+    try {
+      const res = await fetch('/api/checkout/invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pay),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Payment failed.')
+      window.location.href = data.url
+    } catch (err) {
+      setPayError(err.message)
+    } finally {
+      setPaying(false)
+    }
+  }
+
+  // ── Intake state ───────────────────────────────────────────────────────────
+  const [step, setStep]             = useState(1)
+  const [services, setServices]     = useState([])
+  const [project, setProject]       = useState(blankProject())
+  const [contact, setContact]       = useState(blankContact())
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted]   = useState(false)
+  const [refNum, setRefNum]         = useState('')
+  const [intakeError, setIntakeError] = useState(null)
+
+  function toggleService(id) { setServices(prev => prev.includes(id) ? prev.filter(s=>s!==id) : [...prev,id]) }
   function projChange(e)    { const {name,value}=e.target; setProject(p=>({...p,[name]:value})) }
   function contactChange(e) { const {name,value}=e.target; setContact(p=>({...p,[name]:value}))  }
-  function payChange(e)     { const {name,value}=e.target; setPay(p=>({...p,[name]:value}))       }
 
   async function submitIntake() {
     setSubmitting(true); setIntakeError(null)
@@ -62,7 +113,7 @@ export default function ClientPortal() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          services: services.map(id => SERVICES.find(s => s.id === id)?.title).filter(Boolean),
+          services: services.map(id => SERVICES_INTAKE.find(s=>s.id===id)?.title).filter(Boolean),
           ...project, ...contact,
         }),
       })
@@ -77,83 +128,161 @@ export default function ClientPortal() {
     }
   }
 
-  async function startPayment(e) {
-    e.preventDefault()
-    if (!pay.amount || isNaN(parseFloat(pay.amount))) return
-    setPaying(true); setPayError(null)
-    try {
-      const res = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: pay.amount,
-          description: pay.description || 'Design Services — Squires Solutions',
-          clientEmail: pay.email,
-          invoiceNumber: pay.invoiceNumber,
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Payment setup failed.')
-      window.location.href = data.url
-    } catch (err) {
-      setPayError(err.message)
-    } finally {
-      setPaying(false)
-    }
-  }
-
-  const selectedServices = SERVICES.filter(s => services.includes(s.id))
+  const selectedServices = SERVICES_INTAKE.filter(s => services.includes(s.id))
+  const groupedCatalog   = ['package','service','addon'].map(cat => ({
+    cat,
+    items: catalog.filter(s => s.category === cat),
+  })).filter(g => g.items.length > 0)
 
   return (
     <div className="portal-shell">
       <PortalHeader />
 
       <div className="portal-body">
-        {/* Tab switcher */}
+        {/* ── Tab row ── */}
         <div className="portal-tab-row">
-          <button className={`portal-tab ${tab === 'intake' ? 'active' : ''}`} onClick={() => setTab('intake')}>
-            📋 Request a Project
-          </button>
-          <button className={`portal-tab ${tab === 'pay' ? 'active' : ''}`} onClick={() => setTab('pay')}>
-            💳 Pay an Invoice
-          </button>
+          <button className={`portal-tab ${tab==='services'?'active':''}`} onClick={() => setTab('services')}>🛍 Services & Pricing</button>
+          <button className={`portal-tab ${tab==='intake'?'active':''}`}   onClick={() => setTab('intake')}>📋 Request a Project</button>
+          <button className={`portal-tab ${tab==='pay'?'active':''}`}      onClick={() => setTab('pay')}>💳 Pay an Invoice</button>
         </div>
 
-        {/* ══════════════ PAYMENT TAB ══════════════ */}
+        {/* ══════════════════ SERVICES TAB ══════════════════ */}
+        {tab === 'services' && (
+          <div>
+            {/* Payment success banner */}
+            {paymentStatus === 'success' && (
+              <div className="portal-pay-success" style={{ marginBottom: 24 }}>
+                <div style={{ fontSize: 28, marginBottom: 6 }}>✅</div>
+                <div style={{ fontWeight: 700, color: '#3DD68C', fontSize: 15 }}>Payment Successful!</div>
+                {paidService && catalog.find(s=>s.id===paidService) && (
+                  <div style={{ fontSize: 13, color: 'var(--muted2)', marginTop: 4 }}>
+                    Thank you for purchasing <strong>{catalog.find(s=>s.id===paidService)?.name}</strong>. We'll be in touch within 24 hours.
+                  </div>
+                )}
+              </div>
+            )}
+
+            {checkoutError && <div className="portal-error" style={{ marginBottom: 16 }}>{checkoutError}</div>}
+
+            {/* Email capture (shown when someone clicks Buy) */}
+            {showEmailFor && (
+              <div className="portal-card" style={{ marginBottom: 20, maxWidth: 480 }}>
+                <div className="portal-step-header" style={{ marginBottom: 16 }}>
+                  <h2 className="portal-step-title" style={{ fontSize: 20 }}>
+                    {catalog.find(s=>s.id===showEmailFor)?.name}
+                  </h2>
+                  <p className="portal-step-sub">Enter your email for the receipt (optional), then proceed to checkout.</p>
+                </div>
+                <div className="portal-form-group">
+                  <label className="portal-label">Email (optional)</label>
+                  <input type="email" className="portal-input" value={buyEmail}
+                    onChange={e => setBuyEmail(e.target.value)} placeholder="you@yourbusiness.com" />
+                </div>
+                <div style={{ display:'flex', gap:10, marginTop:8 }}>
+                  <button className="portal-btn portal-btn-primary" style={{ flex:1, justifyContent:'center' }}
+                    onClick={() => { buyService(showEmailFor); setShowEmailFor(null) }}
+                    disabled={checkoutLoading === showEmailFor}>
+                    {checkoutLoading === showEmailFor
+                      ? <><span className="portal-spinner" /> Redirecting…</>
+                      : `💳 Pay ${fmt(catalog.find(s=>s.id===showEmailFor)?.price||0)}`}
+                  </button>
+                  <button className="portal-btn portal-btn-ghost" onClick={() => setShowEmailFor(null)}>Cancel</button>
+                </div>
+              </div>
+            )}
+
+            {catalog.length === 0 && (
+              <div style={{ textAlign:'center', padding: '40px 0', color: 'var(--muted)' }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>⟳</div>
+                <p style={{ fontSize: 13 }}>Loading services…</p>
+              </div>
+            )}
+
+            {groupedCatalog.map(({ cat, items }) => (
+              <div key={cat} style={{ marginBottom: 36 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
+                  <h3 style={{ fontFamily:'var(--font-display)', fontSize:22, letterSpacing:'0.04em', color:'var(--text)' }}>
+                    {CAT[cat]?.label}
+                  </h3>
+                  <div style={{ flex:1, height:1, background:'var(--border)' }} />
+                </div>
+                <div className="portal-catalog-grid">
+                  {items.map(svc => (
+                    <div key={svc.id} className={`portal-catalog-card ${cat === 'package' ? 'portal-catalog-card--featured' : ''}`}>
+                      {cat === 'package' && svc.id === 'studio' && (
+                        <div className="portal-catalog-badge">Most Popular</div>
+                      )}
+                      <div className="portal-catalog-name">{svc.name}</div>
+                      <div className="portal-catalog-desc">{svc.description}</div>
+                      <div className="portal-catalog-price">{fmt(svc.price)}</div>
+                      <div style={{ display:'flex', gap:8, marginTop:'auto', paddingTop:16 }}>
+                        {stripeConfigured ? (
+                          <button
+                            className="portal-btn portal-btn-primary"
+                            style={{ flex:1, justifyContent:'center', fontSize:13 }}
+                            onClick={() => { setShowEmailFor(svc.id); setCheckoutError(null) }}
+                            disabled={!!checkoutLoading}
+                          >
+                            {checkoutLoading === svc.id
+                              ? <><span className="portal-spinner" /> …</>
+                              : 'Buy Now'}
+                          </button>
+                        ) : (
+                          <a
+                            href="mailto:squiressolutions@gmail.com?subject=Service Inquiry"
+                            className="portal-btn portal-btn-primary"
+                            style={{ flex:1, justifyContent:'center', fontSize:13, textAlign:'center' }}
+                          >
+                            Get Started
+                          </a>
+                        )}
+                        <button
+                          className="portal-btn portal-btn-ghost"
+                          style={{ fontSize:13 }}
+                          onClick={() => setTab('intake')}
+                        >
+                          Request Quote
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ══════════════════ PAY INVOICE TAB ══════════════════ */}
         {tab === 'pay' && (
           <div className="portal-card" style={{ maxWidth: 520, margin: '0 auto' }}>
             {paymentStatus === 'success' && (
-              <div className="portal-pay-success">
-                <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
-                <div style={{ fontWeight: 700, fontSize: 16, color: '#3DD68C', marginBottom: 4 }}>Payment Successful!</div>
-                <div style={{ fontSize: 13, color: 'var(--muted2)' }}>Thank you — we've received your payment and will be in touch shortly.</div>
+              <div className="portal-pay-success" style={{ marginBottom: 24 }}>
+                <div style={{ fontSize: 28 }}>✅</div>
+                <div style={{ fontWeight:700, color:'#3DD68C', marginTop:6 }}>Payment Successful!</div>
+                <div style={{ fontSize:13, color:'var(--muted2)', marginTop:4 }}>Thank you — we'll be in touch shortly.</div>
               </div>
             )}
-
             {paymentStatus === 'cancelled' && (
               <div className="portal-pay-cancelled">
-                <div style={{ fontSize: 13, color: 'var(--orange)' }}>Payment cancelled. No charge was made.</div>
+                <p style={{ fontSize:13, color:'var(--orange)' }}>Payment cancelled. No charge was made.</p>
               </div>
             )}
-
             <div className="portal-step-header">
               <h2 className="portal-step-title">Pay Your Invoice</h2>
-              <p className="portal-step-sub">Enter your invoice details below and pay securely via Stripe.</p>
+              <p className="portal-step-sub">Enter your invoice number and amount, then pay securely via Stripe.</p>
             </div>
-
             {stripeConfigured === false && (
               <div className="inline-notice" style={{ marginBottom: 20 }}>
-                Stripe payments are not yet configured. Please contact{' '}
-                <a href="mailto:squiressolutions@gmail.com" style={{ color: 'var(--accent)' }}>squiressolutions@gmail.com</a>{' '}
+                Stripe is not yet activated. Contact{' '}
+                <a href="mailto:squiressolutions@gmail.com" style={{ color:'var(--accent)' }}>squiressolutions@gmail.com</a>{' '}
                 to arrange payment.
               </div>
             )}
-
             <form onSubmit={startPayment}>
               <div className="portal-form-group">
                 <label className="portal-label">Invoice Number</label>
                 <input type="text" name="invoiceNumber" className="portal-input" value={pay.invoiceNumber}
-                  onChange={payChange} placeholder="e.g. INV-00001" />
+                  onChange={payChange} placeholder="INV-00001" />
               </div>
               <div className="portal-form-group">
                 <label className="portal-label">Amount (USD) <span className="portal-required">*</span></label>
@@ -168,27 +297,22 @@ export default function ClientPortal() {
               <div className="portal-form-group">
                 <label className="portal-label">Description (optional)</label>
                 <input type="text" name="description" className="portal-input" value={pay.description}
-                  onChange={payChange} placeholder="e.g. Brand Identity Project" />
+                  onChange={payChange} placeholder="Brand Identity Project" />
               </div>
-
               {payError && <div className="portal-error">{payError}</div>}
-
-              <button type="submit" className="portal-btn portal-btn-primary w-full"
-                style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}
+              <button type="submit" className="portal-btn portal-btn-primary"
+                style={{ width:'100%', justifyContent:'center', marginTop:8 }}
                 disabled={paying || stripeConfigured === false}>
-                {paying
-                  ? <><span className="portal-spinner" /> Redirecting to payment…</>
-                  : '💳 Pay Now via Stripe'}
+                {paying ? <><span className="portal-spinner" /> Redirecting…</> : '💳 Pay Now via Stripe'}
               </button>
             </form>
-
-            <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12, color: 'var(--muted)' }}>
+            <div style={{ marginTop:20, textAlign:'center', fontSize:12, color:'var(--muted)' }}>
               🔒 Secured by Stripe · We never store your card details
             </div>
           </div>
         )}
 
-        {/* ══════════════ INTAKE TAB ══════════════ */}
+        {/* ══════════════════ INTAKE TAB ══════════════════ */}
         {tab === 'intake' && (
           <>
             {submitted ? (
@@ -202,11 +326,9 @@ export default function ClientPortal() {
                   </p>
                   {refNum && <div className="portal-ref">Reference: <span>{refNum}</span></div>}
                   <div className="portal-success-services">
-                    {selectedServices.map(s => (
-                      <span key={s.id} className="portal-tag">{s.icon} {s.title}</span>
-                    ))}
+                    {selectedServices.map(s => <span key={s.id} className="portal-tag">{s.icon} {s.title}</span>)}
                   </div>
-                  <button className="portal-btn portal-btn-ghost" style={{ marginTop: 24 }}
+                  <button className="portal-btn portal-btn-ghost" style={{ marginTop:24 }}
                     onClick={() => { setSubmitted(false); setStep(1); setServices([]); setProject(blankProject()); setContact(blankContact()) }}>
                     Submit Another Request
                   </button>
@@ -214,29 +336,27 @@ export default function ClientPortal() {
               </div>
             ) : (
               <>
-                {/* Progress */}
                 <div className="portal-progress">
                   {['Services','Project Details','Contact Info','Review'].map((label,i) => (
-                    <div key={label} className={`portal-progress-step ${step > i+1 ? 'done' : ''} ${step === i+1 ? 'active' : ''}`}>
-                      <div className="portal-progress-dot">{step > i+1 ? '✓' : i+1}</div>
+                    <div key={label} className={`portal-progress-step ${step>i+1?'done':''} ${step===i+1?'active':''}`}>
+                      <div className="portal-progress-dot">{step>i+1?'✓':i+1}</div>
                       <div className="portal-progress-label">{label}</div>
                     </div>
                   ))}
                 </div>
 
-                {/* Step 1 */}
                 {step === 1 && (
                   <div className="portal-card">
                     <div className="portal-step-header">
                       <h2 className="portal-step-title">What do you need?</h2>
-                      <p className="portal-step-sub">Select all services that apply — you can pick multiple.</p>
+                      <p className="portal-step-sub">Select all that apply.</p>
                     </div>
                     <div className="portal-services-grid">
-                      {SERVICES.map(s => (
+                      {SERVICES_INTAKE.map(s => (
                         <button key={s.id} type="button"
-                          className={`portal-service-card ${services.includes(s.id) ? 'selected' : ''}`}
+                          className={`portal-service-card ${services.includes(s.id)?'selected':''}`}
                           onClick={() => toggleService(s.id)}>
-                          <div className="portal-service-check">{services.includes(s.id) ? '✓' : ''}</div>
+                          <div className="portal-service-check">{services.includes(s.id)?'✓':''}</div>
                           <div className="portal-service-icon">{s.icon}</div>
                           <div className="portal-service-title">{s.title}</div>
                           <div className="portal-service-desc">{s.desc}</div>
@@ -246,19 +366,18 @@ export default function ClientPortal() {
                     </div>
                     <div className="portal-nav">
                       <div />
-                      <button className="portal-btn portal-btn-primary" onClick={() => setStep(2)} disabled={services.length === 0}>
+                      <button className="portal-btn portal-btn-primary" onClick={() => setStep(2)} disabled={services.length===0}>
                         Next — Project Details →
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* Step 2 */}
                 {step === 2 && (
                   <div className="portal-card">
                     <div className="portal-step-header">
                       <h2 className="portal-step-title">Tell us about your project</h2>
-                      <p className="portal-step-sub">The more detail you share, the better we can help you.</p>
+                      <p className="portal-step-sub">The more detail you share, the better we can help.</p>
                     </div>
                     <div className="portal-form-group">
                       <label className="portal-label">Budget Range</label>
@@ -284,7 +403,7 @@ export default function ClientPortal() {
                         onChange={projChange} placeholder="Describe your business, what you need, who your audience is…" />
                     </div>
                     <div className="portal-form-group">
-                      <label className="portal-label">Inspiration / References (optional)</label>
+                      <label className="portal-label">Inspiration / References</label>
                       <input type="text" name="inspiration" className="portal-input" value={project.inspiration}
                         onChange={projChange} placeholder="Links to brands or styles you like" />
                     </div>
@@ -297,12 +416,11 @@ export default function ClientPortal() {
                   </div>
                 )}
 
-                {/* Step 3 */}
                 {step === 3 && (
                   <div className="portal-card">
                     <div className="portal-step-header">
                       <h2 className="portal-step-title">How can we reach you?</h2>
-                      <p className="portal-step-sub">We'll follow up within 24 hours with a proposal and next steps.</p>
+                      <p className="portal-step-sub">We'll follow up within 24 hours.</p>
                     </div>
                     <div className="portal-grid-2">
                       <div className="portal-form-group">
@@ -311,7 +429,7 @@ export default function ClientPortal() {
                       </div>
                       <div className="portal-form-group">
                         <label className="portal-label">Business / Brand Name</label>
-                        <input type="text" name="business" className="portal-input" value={contact.business} onChange={contactChange} placeholder="Your company name" />
+                        <input type="text" name="business" className="portal-input" value={contact.business} onChange={contactChange} placeholder="Company name" />
                       </div>
                       <div className="portal-form-group">
                         <label className="portal-label">Email <span className="portal-required">*</span></label>
@@ -323,7 +441,7 @@ export default function ClientPortal() {
                       </div>
                     </div>
                     <div className="portal-form-group">
-                      <label className="portal-label">Current Website (optional)</label>
+                      <label className="portal-label">Current Website</label>
                       <input type="text" name="website" className="portal-input" value={contact.website} onChange={contactChange} placeholder="https://yourbusiness.com" />
                     </div>
                     <div className="portal-form-group">
@@ -338,22 +456,21 @@ export default function ClientPortal() {
                     <div className="portal-nav">
                       <button className="portal-btn portal-btn-ghost" onClick={() => setStep(2)}>← Back</button>
                       <button className="portal-btn portal-btn-primary" onClick={() => setStep(4)}
-                        disabled={!contact.name.trim() || !contact.email.trim()}>
+                        disabled={!contact.name.trim()||!contact.email.trim()}>
                         Review Request →
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* Step 4 */}
                 {step === 4 && (
                   <div className="portal-card">
                     <div className="portal-step-header">
                       <h2 className="portal-step-title">Review your request</h2>
-                      <p className="portal-step-sub">Everything look right? Hit submit and we'll be in touch shortly.</p>
+                      <p className="portal-step-sub">Everything look right?</p>
                     </div>
                     <div className="portal-review-section">
-                      <div className="portal-review-label">Services Requested</div>
+                      <div className="portal-review-label">Services</div>
                       <div className="portal-tag-row">
                         {selectedServices.map(s => <span key={s.id} className="portal-tag">{s.icon} {s.title}</span>)}
                       </div>
@@ -361,25 +478,19 @@ export default function ClientPortal() {
                     <div className="portal-review-section">
                       <div className="portal-review-label">Project Details</div>
                       <div className="portal-review-grid">
-                        {project.budget   && <ReviewRow label="Budget"    value={project.budget} />}
-                        {project.timeline && <ReviewRow label="Timeline"  value={project.timeline} />}
+                        {project.budget    && <ReviewRow label="Budget"    value={project.budget} />}
+                        {project.timeline  && <ReviewRow label="Timeline"  value={project.timeline} />}
                         {project.hearAbout && <ReviewRow label="Found via" value={project.hearAbout} />}
                       </div>
                       {project.description && <div className="portal-review-desc">{project.description}</div>}
-                      {project.inspiration && (
-                        <div style={{ marginTop: 8, fontSize: 13, color: '#94AAC4' }}>
-                          <span style={{ fontWeight: 600 }}>References:</span> {project.inspiration}
-                        </div>
-                      )}
                     </div>
                     <div className="portal-review-section">
-                      <div className="portal-review-label">Your Info</div>
+                      <div className="portal-review-label">Contact</div>
                       <div className="portal-review-grid">
                         <ReviewRow label="Name"     value={contact.name} />
                         <ReviewRow label="Email"    value={contact.email} />
                         {contact.business && <ReviewRow label="Business" value={contact.business} />}
                         {contact.phone    && <ReviewRow label="Phone"    value={contact.phone} />}
-                        {contact.website  && <ReviewRow label="Website"  value={contact.website} />}
                       </div>
                     </div>
                     {intakeError && <div className="portal-error">{intakeError}</div>}
@@ -415,7 +526,7 @@ function PortalHeader() {
   return (
     <header className="portal-header">
       <div className="portal-header-inner">
-        <a href="/portal" className="portal-logo" style={{ textDecoration: 'none' }}>
+        <a href="/portal" className="portal-logo" style={{ textDecoration:'none' }}>
           <div className="portal-logo-mark">◈</div>
           <div>
             <div className="portal-logo-name">SQUIRES SOLUTIONS</div>
