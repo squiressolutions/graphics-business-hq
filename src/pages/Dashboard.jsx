@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Palette, Share2, ClipboardList, Megaphone, PenTool, Tag, Target, BarChart2 } from 'lucide-react'
 
 const AGENTS = [
   {
@@ -8,7 +9,7 @@ const AGENTS = [
     description: 'Create brand identities, palettes, and logo concepts.',
     badge: 'Branding',
     badgeClass: 'badge-violet',
-    icon: '◈',
+    Icon: Palette,
   },
   {
     name: 'Social Content',
@@ -16,7 +17,7 @@ const AGENTS = [
     description: 'Generate posts, captions, and content calendars.',
     badge: 'Social',
     badgeClass: 'badge-pink',
-    icon: '◉',
+    Icon: Share2,
   },
   {
     name: 'Client Brief',
@@ -24,7 +25,7 @@ const AGENTS = [
     description: 'Turn client intake into detailed project briefs.',
     badge: 'Strategy',
     badgeClass: 'badge-cyan',
-    icon: '◻',
+    Icon: ClipboardList,
   },
   {
     name: 'Ad Creative',
@@ -32,7 +33,7 @@ const AGENTS = [
     description: 'Concept Meta, TikTok, and Google ad campaigns.',
     badge: 'Advertising',
     badgeClass: 'badge-pink',
-    icon: '◆',
+    Icon: Megaphone,
   },
   {
     name: 'Content Writer',
@@ -40,7 +41,7 @@ const AGENTS = [
     description: 'Write case studies, web copy, and service pages.',
     badge: 'Copywriting',
     badgeClass: 'badge-violet',
-    icon: '◇',
+    Icon: PenTool,
   },
   {
     name: 'Pricing',
@@ -48,7 +49,7 @@ const AGENTS = [
     description: 'Price projects and generate formal proposals.',
     badge: 'Business',
     badgeClass: 'badge-cyan',
-    icon: '◎',
+    Icon: Tag,
   },
   {
     name: 'Prospector',
@@ -56,7 +57,7 @@ const AGENTS = [
     description: 'Find ideal clients and generate outreach sequences.',
     badge: 'Sales',
     badgeClass: 'badge-orange',
-    icon: '🎯',
+    Icon: Target,
   },
   {
     name: 'Campaign Builder',
@@ -64,7 +65,7 @@ const AGENTS = [
     description: 'Build full ad campaigns with copy, creatives, and strategy.',
     badge: 'Marketing',
     badgeClass: 'badge-pink',
-    icon: '📊',
+    Icon: BarChart2,
   },
 ]
 
@@ -164,7 +165,9 @@ export default function Dashboard() {
         <div className="action-grid">
           {AGENTS.map(agent => (
             <Link key={agent.route} to={agent.route} className="action-card">
-              <div className="action-card-icon">{agent.icon}</div>
+              <div className="action-card-icon">
+                <agent.Icon size={22} strokeWidth={1.5} />
+              </div>
               <div className="action-card-title">{agent.name}</div>
               <div className="action-card-desc">{agent.description}</div>
               <div style={{ marginTop: 12 }}>

@@ -1,33 +1,49 @@
 import { NavLink, Link } from 'react-router-dom'
+import {
+  LayoutDashboard,
+  Palette,
+  Share2,
+  ClipboardList,
+  Megaphone,
+  PenTool,
+  Tag,
+  Target,
+  BarChart2,
+  Users,
+  Receipt,
+  Wallet,
+  FileText,
+  Inbox,
+} from 'lucide-react'
 
 const navSections = [
   {
     label: 'Overview',
     items: [
-      { to: '/dashboard', icon: '⬡', label: 'Dashboard' },
+      { to: '/dashboard',      icon: LayoutDashboard, label: 'Dashboard' },
     ],
   },
   {
     label: 'AI Agents',
     items: [
-      { to: '/brand-studio',   icon: '◈', label: 'Brand Studio' },
-      { to: '/social-content', icon: '◉', label: 'Social Content' },
-      { to: '/client-brief',   icon: '◻', label: 'Client Brief' },
-      { to: '/ad-creative',    icon: '◆', label: 'Ad Creative' },
-      { to: '/content-writer', icon: '◇', label: 'Content Writer' },
-      { to: '/pricing',        icon: '◎', label: 'Pricing' },
-      { to: '/prospector',     icon: '🎯', label: 'Prospector' },
-      { to: '/campaign',       icon: '📊', label: 'Campaign Builder' },
+      { to: '/brand-studio',   icon: Palette,        label: 'Brand Studio' },
+      { to: '/social-content', icon: Share2,          label: 'Social Content' },
+      { to: '/client-brief',   icon: ClipboardList,   label: 'Client Brief' },
+      { to: '/ad-creative',    icon: Megaphone,       label: 'Ad Creative' },
+      { to: '/content-writer', icon: PenTool,         label: 'Content Writer' },
+      { to: '/pricing',        icon: Tag,             label: 'Pricing' },
+      { to: '/prospector',     icon: Target,          label: 'Prospector' },
+      { to: '/campaign',       icon: BarChart2,       label: 'Campaign Builder' },
     ],
   },
   {
     label: 'Business',
     items: [
-      { to: '/clients',   icon: '👥', label: 'Client Tracker' },
-      { to: '/invoices',  icon: '🧾', label: 'Invoices' },
-      { to: '/expenses',  icon: '💰', label: 'Expenses' },
-      { to: '/contracts', icon: '📋', label: 'Contracts' },
-      { to: '/requests',  icon: '📥', label: 'Client Requests' },
+      { to: '/clients',   icon: Users,       label: 'Client Tracker' },
+      { to: '/invoices',  icon: Receipt,     label: 'Invoices' },
+      { to: '/expenses',  icon: Wallet,      label: 'Expenses' },
+      { to: '/contracts', icon: FileText,    label: 'Contracts' },
+      { to: '/requests',  icon: Inbox,       label: 'Client Requests' },
     ],
   },
 ]
@@ -54,19 +70,24 @@ export default function Sidebar({ isOpen, onToggle }) {
         <div className="sidebar-section" key={section.label}>
           {isOpen && <div className="sidebar-section-label">{section.label}</div>}
           <nav className="sidebar-nav">
-            {section.items.map(item => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                title={!isOpen ? item.label : undefined}
-                className={({ isActive }) =>
-                  'sidebar-nav-item' + (isActive ? ' active' : '')
-                }
-              >
-                <span className="nav-icon">{item.icon}</span>
-                {isOpen && <span className="nav-label">{item.label}</span>}
-              </NavLink>
-            ))}
+            {section.items.map(item => {
+              const Icon = item.icon
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  title={!isOpen ? item.label : undefined}
+                  className={({ isActive }) =>
+                    'sidebar-nav-item' + (isActive ? ' active' : '')
+                  }
+                >
+                  <span className="nav-icon">
+                    <Icon size={16} strokeWidth={1.75} />
+                  </span>
+                  {isOpen && <span className="nav-label">{item.label}</span>}
+                </NavLink>
+              )
+            })}
           </nav>
         </div>
       ))}
