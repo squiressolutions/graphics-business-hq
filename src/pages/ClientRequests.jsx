@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 
 const STATUS_CONFIG = {
   new:        { label: 'New',         cls: 'badge-pink',   dot: '#EDD86A' },
@@ -297,11 +297,94 @@ export default function ClientRequests() {
                     Delete
                   </button>
                 </div>
+
+                {/* File Delivery */}
+                <DeliverFiles submissionId={req.id} clientName={req.name} />
               </div>
             )}
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+// ─── Admin: Deliver Files to Client ─────────────────────────────────────────
+// TODO: When auth is implemented, filter deliveries by client session/token
+function DeliverFiles({ submissionId, clientName }) {
+  const [file, setFile]       = useState(null)
+  const [notes, setNotes]     = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [delivered, setDelivered] = useState([])
+  const [error, setError]     = useState(null)
+  const [success, setSuccess] = useState(false)
+  const fileRef = useRef(null)
+
+  useEffect(() => {
+    // Load existing deliveries for this submission
+    fetch(`/api/portal/deliveries?refNum=__admin_${submissionId}`)
+      .then(r => r.json())
+      .then(d => setDelivered(d.files || []))
+      .catch(() => {})
+  }, [submissionId])
+
+  async function deliver(e) {
+    e.preventDefault()
+    if (!file) return setError('Select a file first.')
+    setUploading(true); setError(null); setSuccess(false)
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('submissionId', submissionId)
+    fd.append('notes', notes)
+    try {
+      const res  = await fetch('/api/portal/deliver', { method:'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed.')
+      setDelivered(prev => [...prev, data])
+      setFile(null); setNotes(''); setSuccess(true)
+      if (fileRef.current) fileRef.current.value = ''
+      setTimeout(() => setSuccess(false), 3000)
+    } catch (err) { setError(err.message) }
+    finally { setUploading(false) }
+  }
+
+  function fmtSize(b) { return b < 1048576 ? `${(b/1024).toFixed(0)} KB` : `${(b/1048576).toFixed(1)} MB` }
+
+  return (
+    <div style={{ marginTop:20, paddingTop:16, borderTop:'1px dashed var(--border2)' }}>
+      <div style={{ fontSize:11, color:'var(--muted)', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', marginBottom:12 }}>
+        📎 Deliver Files to {clientName || 'Client'}
+      </div>
+
+      {/* Existing deliveries */}
+      {delivered.length > 0 && (
+        <div style={{ marginBottom:12 }}>
+          {delivered.map(d => (
+            <div key={d.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 0', borderBottom:'1px solid var(--border)', fontSize:12 }}>
+              <span style={{ color:'var(--muted2)', flex:1 }}>{d.originalName}</span>
+              <span style={{ color:'var(--muted)', fontSize:11 }}>{fmtSize(d.size)}</span>
+              <a href={d.url} download style={{ color:'var(--accent)', fontSize:11, textDecoration:'none', fontWeight:600 }}>↓ Download</a>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <form onSubmit={deliver} style={{ display:'flex', flexWrap:'wrap', gap:8, alignItems:'flex-end' }}>
+        <div style={{ flex:'1 1 200px' }}>
+          <input ref={fileRef} type="file" accept=".png,.jpg,.jpeg,.pdf"
+            style={{ fontSize:12, color:'var(--muted2)', width:'100%' }}
+            onChange={e => setFile(e.target.files?.[0] || null)} />
+          <div style={{ fontSize:10, color:'var(--muted)', marginTop:3 }}>PNG, JPEG, PDF · max 20MB</div>
+        </div>
+        <input type="text" value={notes} onChange={e=>setNotes(e.target.value)}
+          placeholder="Notes for client (optional)"
+          style={{ flex:'1 1 180px', background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:6, padding:'6px 10px', fontSize:12, color:'var(--text)' }} />
+        <button type="submit" className="btn btn-cyan btn-sm" disabled={uploading}>
+          {uploading ? 'Sending…' : '↑ Deliver File'}
+        </button>
+      </form>
+      {error   && <div style={{ fontSize:11, color:'var(--red)', marginTop:6 }}>{error}</div>}
+      {success && <div style={{ fontSize:11, color:'var(--green)', marginTop:6 }}>✓ File delivered! Client can download from their portal.</div>}
     </div>
   )
 }

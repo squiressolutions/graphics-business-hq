@@ -3,9 +3,10 @@ import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
+import multer from 'multer';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'fs';
 
 // ─── Client ───────────────────────────────────────────────────────────────────
 
@@ -106,8 +107,15 @@ const AGENTS = {
 // ─── Client Intake Persistence ────────────────────────────────────────────────
 
 const __dirnameEarly = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirnameEarly, 'data');
-const SUBMISSIONS_FILE = join(DATA_DIR, 'submissions.json');
+const DATA_DIR       = join(__dirnameEarly, 'data');
+const UPLOADS_DIR    = join(DATA_DIR, 'uploads');
+const DELIVERIES_DIR = join(DATA_DIR, 'deliveries');
+const SUBMISSIONS_FILE  = join(DATA_DIR, 'submissions.json');
+const DELIVERIES_FILE   = join(DATA_DIR, 'deliveries.json');
+
+// Ensure directories exist
+mkdirSync(UPLOADS_DIR,    { recursive: true });
+mkdirSync(DELIVERIES_DIR, { recursive: true });
 
 function loadSubmissions() {
   try { return JSON.parse(readFileSync(SUBMISSIONS_FILE, 'utf8')); } catch { return []; }
@@ -116,7 +124,42 @@ function saveSubmissions(data) {
   try { mkdirSync(DATA_DIR, { recursive: true }); writeFileSync(SUBMISSIONS_FILE, JSON.stringify(data, null, 2)); } catch {}
 }
 
+function loadDeliveries() {
+  try { return JSON.parse(readFileSync(DELIVERIES_FILE, 'utf8')); } catch { return []; }
+}
+function saveDeliveries(data) {
+  try { writeFileSync(DELIVERIES_FILE, JSON.stringify(data, null, 2)); } catch {}
+}
+
 let submissions = loadSubmissions();
+let deliveries  = loadDeliveries();
+
+// ─── Multer (file uploads) ────────────────────────────────────────────────────
+// NOTE: Render's filesystem is ephemeral — files are lost on redeploy.
+// TODO: swap multer disk storage for S3 / Supabase Storage / Firebase Storage
+//       when a persistent storage backend is available.
+
+const ALLOWED_MIME  = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB per file
+const MAX_TOTAL     = 50 * 1024 * 1024; // 50 MB total per submission
+
+function multerDiskStorage(dest) {
+  return multer.diskStorage({
+    destination: dest,
+    filename: (_req, file, cb) => {
+      const safe = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+      cb(null, `${Date.now()}_${safe}`);
+    },
+  });
+}
+
+const clientUpload   = multer({ storage: multerDiskStorage(UPLOADS_DIR),    limits: { fileSize: MAX_FILE_SIZE, files: 5 }, fileFilter: typeGuard });
+const deliveryUpload = multer({ storage: multerDiskStorage(DELIVERIES_DIR), limits: { fileSize: MAX_FILE_SIZE, files: 1 }, fileFilter: typeGuard });
+
+function typeGuard(_req, file, cb) {
+  if (ALLOWED_MIME.includes(file.mimetype)) cb(null, true);
+  else cb(Object.assign(new Error('Only PNG, JPEG, and PDF files are accepted.'), { code: 'INVALID_TYPE' }));
+}
 
 function makeRefNum() {
   return 'REQ-' + String(Date.now()).slice(-6) + Math.random().toString(36).slice(2, 5).toUpperCase();
@@ -763,6 +806,175 @@ app.post('/api/stripe/setup-products', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// ─── Portal: Contact Form ─────────────────────────────────────────────────────
+
+app.post('/api/portal/contact', async (req, res) => {
+  const { name, email, message, phone } = req.body;
+  if (!name || !email || !message) return res.status(400).json({ error: 'Name, email, and message are required.' });
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (apiKey) {
+    const resend = new Resend(apiKey);
+    const html = `
+    <div style="background:#f9f9f9;padding:32px;font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+      <div style="background:#050C1A;border-radius:10px 10px 0 0;padding:20px 24px;">
+        <div style="font-size:22px;font-weight:900;color:#D4A017;letter-spacing:3px;">SQUIRES SOLUTIONS</div>
+        <div style="font-size:12px;color:#6888A8;margin-top:2px;">New Message from Portal</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e5e5e5;border-radius:0 0 10px 10px;padding:24px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:6px 14px 6px 0;color:#6888A8;font-weight:600;font-size:13px;white-space:nowrap;">Name</td><td style="padding:6px 0;font-size:13px;">${name}</td></tr>
+          <tr><td style="padding:6px 14px 6px 0;color:#6888A8;font-weight:600;font-size:13px;">Email</td><td style="padding:6px 0;font-size:13px;"><a href="mailto:${email}">${email}</a></td></tr>
+          ${phone ? `<tr><td style="padding:6px 14px 6px 0;color:#6888A8;font-weight:600;font-size:13px;">Phone</td><td style="padding:6px 0;font-size:13px;">${phone}</td></tr>` : ''}
+        </table>
+        <div style="margin-top:16px;padding:16px;background:#f5f5f5;border-radius:8px;font-size:14px;line-height:1.7;white-space:pre-wrap;">${message}</div>
+        <div style="margin-top:20px;"><a href="mailto:${email}?subject=Re: Your message to Squires Solutions" style="display:inline-block;background:#D4A017;color:#0a0a0a;font-weight:700;padding:10px 22px;border-radius:8px;text-decoration:none;font-size:13px;">Reply to ${name} →</a></div>
+      </div>
+    </div>`;
+    await resend.emails.send({
+      from: 'Squires Solutions <onboarding@resend.dev>',
+      to: 'squiressolutions@gmail.com',
+      subject: `Message from ${name} — Squires Solutions Portal`,
+      html,
+    }).catch(err => console.error('[email] contact form:', err.message));
+  }
+  res.json({ ok: true });
+});
+
+// ─── Portal: Client File Upload ───────────────────────────────────────────────
+
+app.post('/api/portal/upload', (req, res) => {
+  clientUpload.array('files', 5)(req, res, async (err) => {
+    if (err) return res.status(400).json({ error: err.message || 'Upload failed.' });
+
+    const files = req.files || [];
+    if (files.length === 0) return res.status(400).json({ error: 'No files received.' });
+
+    // Enforce 50MB total
+    const totalSize = files.reduce((s, f) => s + f.size, 0);
+    if (totalSize > MAX_TOTAL) {
+      files.forEach(f => { try { unlinkSync(f.path); } catch {} });
+      return res.status(400).json({ error: 'Total upload size exceeds 50 MB limit.' });
+    }
+
+    const { clientName, clientEmail, description } = req.body;
+
+    // Email notification
+    const apiKey = process.env.RESEND_API_KEY;
+    if (apiKey) {
+      const resend = new Resend(apiKey);
+      const fileRows = files.map(f =>
+        `<tr><td style="padding:4px 12px 4px 0;font-size:13px;">${f.originalname}</td><td style="padding:4px 0;font-size:13px;color:#6888A8;">${(f.size/1024/1024).toFixed(2)} MB</td></tr>`
+      ).join('');
+      const html = `
+      <div style="background:#f9f9f9;padding:32px;font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+        <div style="background:#050C1A;border-radius:10px 10px 0 0;padding:20px 24px;">
+          <div style="font-size:22px;font-weight:900;color:#D4A017;letter-spacing:3px;">SQUIRES SOLUTIONS</div>
+          <div style="font-size:12px;color:#6888A8;margin-top:2px;">📎 New Client File Upload</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e5e5e5;border-radius:0 0 10px 10px;padding:24px;">
+          <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+            <tr><td style="padding:6px 14px 6px 0;color:#6888A8;font-weight:600;font-size:13px;">Client</td><td style="padding:6px 0;font-size:13px;">${clientName || '—'}</td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6888A8;font-weight:600;font-size:13px;">Email</td><td style="padding:6px 0;font-size:13px;">${clientEmail || '—'}</td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6888A8;font-weight:600;font-size:13px;vertical-align:top;">Description</td><td style="padding:6px 0;font-size:13px;">${description || '—'}</td></tr>
+          </table>
+          <div style="font-weight:700;font-size:12px;color:#6888A8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Files Uploaded</div>
+          <table style="width:100%;border-collapse:collapse;">${fileRows}</table>
+          <div style="margin-top:16px;padding:12px;background:#fff8e1;border-radius:6px;font-size:12px;color:#888;">
+            Files are stored on the server temporarily. Download them promptly as they may be cleared on server redeploy.
+          </div>
+          <div style="margin-top:20px;"><a href="https://graphics-business-hq.onrender.com/client-requests" style="display:inline-block;background:#D4A017;color:#0a0a0a;font-weight:700;padding:10px 22px;border-radius:8px;text-decoration:none;font-size:13px;">View Admin Portal →</a></div>
+        </div>
+      </div>`;
+      await resend.emails.send({
+        from: 'Squires Solutions <onboarding@resend.dev>',
+        to: 'squiressolutions@gmail.com',
+        subject: `📎 New File Upload from ${clientName || 'Client'} — Squires Solutions`,
+        html,
+      }).catch(err => console.error('[email] upload notification:', err.message));
+    }
+
+    res.json({ ok: true, files: files.map(f => ({ name: f.originalname, size: f.size, stored: f.filename })) });
+  });
+});
+
+// ─── Portal: File Deliveries ──────────────────────────────────────────────────
+
+// Serve uploaded/delivered files statically
+// TODO: Replace with presigned S3/Supabase URLs when persistent storage is configured
+
+// GET all deliveries — scoped by refNum if provided
+// TODO: Scope by authenticated client session/token when auth is implemented
+app.get('/api/portal/deliveries', (req, res) => {
+  const { refNum } = req.query;
+  if (refNum) {
+    const sub = submissions.find(s => s.refNum === refNum);
+    if (!sub) return res.json({ found: false, files: [] });
+    const files = deliveries.filter(d => d.submissionId === sub.id || d.refNum === refNum);
+    return res.json({ found: true, status: sub.status, client: sub.name, files });
+  }
+  res.json({ found: false, files: [] });
+});
+
+// Admin: deliver a file to a client submission
+app.post('/api/portal/deliver', (req, res) => {
+  deliveryUpload.single('file')(req, res, async (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    if (!req.file) return res.status(400).json({ error: 'No file provided.' });
+
+    const { submissionId, notes } = req.body;
+    const sub = submissions.find(s => s.id === submissionId);
+
+    const delivery = {
+      id: 'del_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      submissionId: submissionId || '',
+      refNum: sub?.refNum || '',
+      clientName: sub?.name || '',
+      clientEmail: sub?.email || '',
+      notes: notes || '',
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      uploadedAt: new Date().toISOString(),
+      url: `/api/portal/file/${req.file.filename}`,
+    };
+
+    deliveries.push(delivery);
+    saveDeliveries(deliveries);
+
+    // Notify client if email available
+    const apiKey = process.env.RESEND_API_KEY;
+    if (apiKey && delivery.clientEmail) {
+      const resend = new Resend(apiKey);
+      await resend.emails.send({
+        from: 'Squires Solutions <onboarding@resend.dev>',
+        to: delivery.clientEmail,
+        subject: `Your files are ready — Squires Solutions`,
+        html: `<div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;padding:24px;">
+          <div style="font-size:22px;font-weight:900;color:#D4A017;margin-bottom:8px;">SQUIRES SOLUTIONS</div>
+          <p>Hi ${delivery.clientName || 'there'},</p>
+          <p>Your deliverable files are ready! A new file has been uploaded to your project:</p>
+          <p style="background:#f5f5f5;padding:14px;border-radius:8px;font-weight:600;">${delivery.originalName}</p>
+          ${notes ? `<p style="color:#555;">${notes}</p>` : ''}
+          <p>Visit the portal to view and download your files:</p>
+          <a href="https://graphics-business-hq.onrender.com/portal" style="display:inline-block;background:#D4A017;color:#0a0a0a;font-weight:700;padding:12px 24px;border-radius:8px;text-decoration:none;">View Files →</a>
+          <p style="font-size:12px;color:#999;margin-top:24px;">Squires Solutions · squiressolutions@gmail.com</p>
+        </div>`,
+      }).catch(() => {});
+    }
+
+    res.json(delivery);
+  });
+});
+
+// Download a delivered file
+app.get('/api/portal/file/:filename', (req, res) => {
+  const fp = join(DELIVERIES_DIR, req.params.filename);
+  if (!existsSync(fp)) return res.status(404).json({ error: 'File not found.' });
+  res.download(fp);
 });
 
 // ─── Static / SPA ─────────────────────────────────────────────────────────────
