@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
+import Stripe from 'stripe';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
@@ -16,6 +17,17 @@ function getClient() {
     _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   }
   return _client;
+}
+
+let _stripe = null;
+function getStripe() {
+  if (!_stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is not set.');
+    }
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  }
+  return _stripe;
 }
 
 // ─── Agent Definitions ────────────────────────────────────────────────────────
@@ -553,6 +565,42 @@ Write in formal but clear legal language. Include date and signature blocks at t
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// ─── Stripe Checkout ──────────────────────────────────────────────────────────
+
+app.post('/api/create-checkout-session', async (req, res) => {
+  const { amount, description, clientEmail, invoiceNumber } = req.body;
+  try {
+    const stripe = getStripe();
+    const appUrl = process.env.APP_URL || `http://localhost:${process.env.PORT || 3001}`;
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: description || 'Design Services — Squires Solutions',
+            description: invoiceNumber ? `Invoice ${invoiceNumber}` : 'Creative & Brand Design',
+          },
+          unit_amount: Math.round(parseFloat(amount) * 100),
+        },
+        quantity: 1,
+      }],
+      mode: 'payment',
+      customer_email: clientEmail || undefined,
+      success_url: `${appUrl}/portal?payment=success&inv=${invoiceNumber || ''}`,
+      cancel_url: `${appUrl}/portal?payment=cancelled`,
+      metadata: { invoiceNumber: invoiceNumber || '', clientEmail: clientEmail || '' },
+    });
+    res.json({ url: session.url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/stripe-status', (_req, res) => {
+  res.json({ configured: !!process.env.STRIPE_SECRET_KEY });
 });
 
 // ─── Static / SPA ─────────────────────────────────────────────────────────────

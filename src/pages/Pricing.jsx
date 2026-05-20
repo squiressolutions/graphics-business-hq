@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const TIERS = [
   {
@@ -71,6 +72,7 @@ const INITIAL = {
 }
 
 export default function Pricing() {
+  const navigate = useNavigate()
   const [form, setForm] = useState(INITIAL)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
@@ -168,7 +170,13 @@ export default function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <button className={`btn ${tier.btnClass} w-full`}>
+                <button
+                  className={`btn ${tier.btnClass} w-full`}
+                  onClick={() => tier.btnLabel === 'Contact Us'
+                    ? window.location.href = 'mailto:squiressolutions@gmail.com?subject=Agency Package Inquiry'
+                    : window.open('/portal', '_blank')
+                  }
+                >
                   {tier.btnLabel}
                 </button>
               </div>

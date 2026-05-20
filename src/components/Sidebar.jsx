@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 
 const navSections = [
   {
@@ -36,15 +36,15 @@ export default function Sidebar({ isOpen, onToggle }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div className="sidebar-logo-mark">
+        <Link to="/dashboard" className="sidebar-logo-mark" style={{ textDecoration: 'none' }}>
           <div className="sidebar-logo-icon">◈</div>
           {isOpen && (
             <div className="sidebar-logo-text-wrap">
               <div className="sidebar-logo-text">SQUIRES</div>
-              <div className="sidebar-logo-sub">Graphics Studio</div>
+              <div className="sidebar-logo-sub">Solutions</div>
             </div>
           )}
-        </div>
+        </Link>
         <button className="sidebar-toggle" onClick={onToggle} aria-label="Toggle sidebar">
           {isOpen ? '‹' : '›'}
         </button>
@@ -75,10 +75,10 @@ export default function Sidebar({ isOpen, onToggle }) {
         {isOpen ? (
           <>
             <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 2 }}>Powered by Claude AI</div>
-            <div style={{ fontSize: 10, color: 'var(--border2)' }}>v1.1.0 · 8 Agents</div>
+            <div style={{ fontSize: 10, color: 'var(--border2)' }}>v1.2.0 · 8 Agents</div>
           </>
         ) : (
-          <div style={{ fontSize: 10, color: 'var(--border2)', textAlign: 'center' }}>SG</div>
+          <div style={{ fontSize: 10, color: 'var(--border2)', textAlign: 'center' }}>SS</div>
         )}
       </div>
     </aside>
