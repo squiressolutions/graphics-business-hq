@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import Stripe from 'stripe';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
@@ -125,19 +125,14 @@ function makeRefNum() {
 // ─── Email Notifications ──────────────────────────────────────────────────────
 
 async function sendIntakeNotification(entry) {
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-  if (!smtpUser || !smtpPass) return; // silently skip if not configured
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return; // silently skip if not configured
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: smtpUser, pass: smtpPass },
-  });
-
+  const resend = new Resend(apiKey);
   const isConsult = entry.type === 'consultation';
   const subject = isConsult
-    ? `📅 New Consultation Request — ${entry.name || 'Unknown'} (${entry.refNum})`
-    : `📥 New Client Request — ${entry.name || 'Unknown'} (${entry.refNum})`;
+    ? `New Consultation Request — ${entry.name || 'Unknown'} (${entry.refNum})`
+    : `New Client Request — ${entry.name || 'Unknown'} (${entry.refNum})`;
 
   const rows = [
     ['Type',       isConsult ? 'Free Consultation' : 'Project Request'],
@@ -154,41 +149,46 @@ async function sendIntakeNotification(entry) {
     ] : [
       ['Budget',   entry.budget || '—'],
       ['Timeline', entry.timeline || '—'],
-      ['Desc',     entry.description || '—'],
+      ['Description', entry.description || '—'],
     ]),
     ['Found via',  entry.hearAbout || '—'],
     ['Submitted',  new Date(entry.submittedAt).toLocaleString()],
   ];
 
   const tableRows = rows.map(([k, v]) =>
-    `<tr><td style="padding:6px 12px;color:#6888A8;white-space:nowrap;font-weight:600;">${k}</td><td style="padding:6px 12px;color:#EDE8D5;">${v}</td></tr>`
+    `<tr><td style="padding:6px 14px 6px 0;color:#6888A8;white-space:nowrap;font-weight:600;font-size:13px;vertical-align:top;">${k}</td><td style="padding:6px 0;color:#1a1a1a;font-size:13px;">${v}</td></tr>`
   ).join('');
 
   const html = `
-  <div style="background:#050C1A;color:#EDE8D5;font-family:'DM Sans',sans-serif;padding:32px;max-width:640px;margin:0 auto;border-radius:12px;">
-    <div style="font-size:28px;font-weight:800;color:#D4A017;letter-spacing:2px;margin-bottom:4px;">SQUIRES SOLUTIONS</div>
-    <div style="font-size:13px;color:#6888A8;margin-bottom:24px;">squiressolutions@gmail.com</div>
-    <div style="background:#091428;border:1px solid #162945;border-radius:10px;padding:20px;margin-bottom:20px;">
-      <div style="font-size:11px;color:#6888A8;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:10px;">
-        ${isConsult ? '📅 Free Consultation Request' : '📥 New Project Request'}
-      </div>
-      <table style="width:100%;border-collapse:collapse;">${tableRows}</table>
+  <div style="background:#f9f9f9;padding:32px;font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+    <div style="background:#050C1A;border-radius:10px 10px 0 0;padding:20px 24px;margin-bottom:0;">
+      <div style="font-size:22px;font-weight:900;color:#D4A017;letter-spacing:3px;">SQUIRES SOLUTIONS</div>
+      <div style="font-size:12px;color:#6888A8;margin-top:2px;">${isConsult ? 'New Consultation Request' : 'New Client Request'}</div>
     </div>
-    <a href="https://graphics-business-hq.onrender.com/client-requests" style="display:inline-block;background:#D4A017;color:#050C1A;font-weight:700;padding:12px 24px;border-radius:8px;text-decoration:none;font-size:14px;">
-      View in Admin →
-    </a>
-    <div style="font-size:11px;color:#6888A8;margin-top:20px;">This notification was sent automatically by your Squires Solutions admin portal.</div>
+    <div style="background:#ffffff;border:1px solid #e5e5e5;border-radius:0 0 10px 10px;padding:24px;">
+      <table style="width:100%;border-collapse:collapse;">${tableRows}</table>
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid #eee;">
+        <a href="https://graphics-business-hq.onrender.com/client-requests"
+           style="display:inline-block;background:#D4A017;color:#0a0a0a;font-weight:700;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:14px;letter-spacing:.5px;">
+          View in Admin →
+        </a>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#999;margin-top:14px;text-align:center;">
+      Squires Solutions · squiressolutions@gmail.com · Auto-notification
+    </div>
   </div>`;
 
   try {
-    await transporter.sendMail({
-      from: `"Squires Solutions" <${smtpUser}>`,
+    await resend.emails.send({
+      from: 'Squires Solutions <onboarding@resend.dev>',
       to: 'squiressolutions@gmail.com',
       subject,
       html,
     });
+    console.log('[email] Notification sent for', entry.refNum);
   } catch (err) {
-    console.warn('[email] Failed to send notification:', err.message);
+    console.error('[email] Failed to send notification:', err.message);
   }
 }
 
