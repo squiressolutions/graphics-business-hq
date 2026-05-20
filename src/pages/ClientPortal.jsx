@@ -4,7 +4,7 @@ import {
   ShoppingBag, ClipboardList, CreditCard,
   Palette, PenTool, Share2, Monitor, Package,
   Megaphone, Play, RefreshCw, Lock, CheckCircle,
-  Mail, ArrowRight, ChevronLeft,
+  Mail, CalendarDays,
 } from 'lucide-react'
 
 // ── Static service data (mirrors server catalog) ──────────────────────────────
@@ -40,6 +40,32 @@ export default function ClientPortal() {
   const paidService    = searchParams.get('service')
 
   const [tab, setTab] = useState(paymentStatus ? 'pay' : 'services')
+
+  // ── Consultation state ─────────────────────────────────────────────────────
+  const [consult, setConsult] = useState({ name:'', email:'', phone:'', business:'', topic:'', preferredTime:'' })
+  const [consultSubmitting, setConsultSubmitting] = useState(false)
+  const [consultSubmitted, setConsultSubmitted] = useState(false)
+  const [consultError, setConsultError]   = useState(null)
+
+  function consultChange(e) { const {name,value}=e.target; setConsult(p=>({...p,[name]:value})) }
+
+  async function submitConsult(e) {
+    e.preventDefault()
+    setConsultSubmitting(true); setConsultError(null)
+    try {
+      const res = await fetch('/api/client-intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...consult, type: 'consultation', services: ['Free Consultation'] }),
+      })
+      if (!res.ok) throw new Error('Submission failed. Please try again.')
+      setConsultSubmitted(true)
+    } catch (err) {
+      setConsultError(err.message)
+    } finally {
+      setConsultSubmitting(false)
+    }
+  }
 
   // ── Services catalog from API ──────────────────────────────────────────────
   const [catalog, setCatalog]                 = useState([])
@@ -153,6 +179,9 @@ export default function ClientPortal() {
           <button className={`portal-tab ${tab==='intake'?'active':''}`} onClick={() => setTab('intake')}>
             <ClipboardList size={15} strokeWidth={1.75} /> Request a Project
           </button>
+          <button className={`portal-tab ${tab==='consult'?'active':''}`} onClick={() => { setTab('consult'); setConsultSubmitted(false) }}>
+            <CalendarDays size={15} strokeWidth={1.75} /> Free Consultation
+          </button>
           <button className={`portal-tab ${tab==='pay'?'active':''}`} onClick={() => setTab('pay')}>
             <CreditCard size={15} strokeWidth={1.75} /> Pay an Invoice
           </button>
@@ -164,12 +193,9 @@ export default function ClientPortal() {
             <div className="portal-consult-title">Not sure where to start?</div>
             <div className="portal-consult-sub">Book a free 30-min consultation — no commitment, no pressure.</div>
           </div>
-          <a
-            href="mailto:squiressolutions@gmail.com?subject=Free Consultation Request&body=Hi, I'd like to book a free consultation to discuss my project."
-            className="portal-consult-btn"
-          >
-            <Mail size={15} strokeWidth={1.75} /> Book Free Consultation
-          </a>
+          <button className="portal-consult-btn" onClick={() => { setTab('consult'); setConsultSubmitted(false) }}>
+            <CalendarDays size={15} strokeWidth={1.75} /> Book Free Consultation
+          </button>
         </div>
 
         {/* ══════════════════ SERVICES TAB ══════════════════ */}
@@ -280,6 +306,78 @@ export default function ClientPortal() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ══════════════════ CONSULTATION TAB ══════════════════ */}
+        {tab === 'consult' && (
+          <div className="portal-card" style={{ maxWidth: 560, margin: '0 auto' }}>
+            {consultSubmitted ? (
+              <div className="portal-success">
+                <CheckCircle size={48} color="#3DD68C" style={{ marginBottom: 12 }} />
+                <h2 className="portal-success-title">You're booked!</h2>
+                <p className="portal-success-sub">
+                  Thanks, <strong>{consult.name}</strong>! We'll reach out to <strong>{consult.email}</strong> within 24 hours to confirm your free 30-min consultation.
+                </p>
+                <button className="portal-btn portal-btn-ghost" style={{ marginTop: 24 }}
+                  onClick={() => { setConsultSubmitted(false); setConsult({ name:'', email:'', phone:'', business:'', topic:'', preferredTime:'' }) }}>
+                  Submit Another
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="portal-step-header">
+                  <h2 className="portal-step-title">Free 30-Min Consultation</h2>
+                  <p className="portal-step-sub">No commitment, no pressure. Let's talk about your brand goals and how we can help.</p>
+                </div>
+                <form onSubmit={submitConsult}>
+                  <div className="portal-grid-2">
+                    <div className="portal-form-group">
+                      <label className="portal-label">Your Name <span className="portal-required">*</span></label>
+                      <input type="text" name="name" className="portal-input" value={consult.name}
+                        onChange={consultChange} placeholder="Jane Smith" required />
+                    </div>
+                    <div className="portal-form-group">
+                      <label className="portal-label">Business / Brand</label>
+                      <input type="text" name="business" className="portal-input" value={consult.business}
+                        onChange={consultChange} placeholder="Company name" />
+                    </div>
+                    <div className="portal-form-group">
+                      <label className="portal-label">Email <span className="portal-required">*</span></label>
+                      <input type="email" name="email" className="portal-input" value={consult.email}
+                        onChange={consultChange} placeholder="jane@yourbusiness.com" required />
+                    </div>
+                    <div className="portal-form-group">
+                      <label className="portal-label">Phone (optional)</label>
+                      <input type="tel" name="phone" className="portal-input" value={consult.phone}
+                        onChange={consultChange} placeholder="+1 (555) 000-0000" />
+                    </div>
+                  </div>
+                  <div className="portal-form-group">
+                    <label className="portal-label">What do you want to discuss? <span className="portal-required">*</span></label>
+                    <textarea name="topic" className="portal-textarea" rows={4} value={consult.topic}
+                      onChange={consultChange} required
+                      placeholder="e.g. I need a full rebrand for my restaurant, not sure where to start…" />
+                  </div>
+                  <div className="portal-form-group">
+                    <label className="portal-label">Preferred Time / Availability</label>
+                    <input type="text" name="preferredTime" className="portal-input" value={consult.preferredTime}
+                      onChange={consultChange} placeholder="e.g. Weekdays after 3pm EST, or anytime Friday" />
+                  </div>
+                  {consultError && <div className="portal-error">{consultError}</div>}
+                  <button type="submit" className="portal-btn portal-btn-primary"
+                    style={{ width:'100%', justifyContent:'center', marginTop: 8 }}
+                    disabled={consultSubmitting}>
+                    {consultSubmitting
+                      ? <><span className="portal-spinner" /> Submitting…</>
+                      : <><CalendarDays size={15} style={{marginRight:6}} /> Book My Free Consultation</>}
+                  </button>
+                </form>
+                <p style={{ textAlign:'center', fontSize:12, color:'var(--muted)', marginTop:16 }}>
+                  100% free · No card required · We'll confirm within 24 hours
+                </p>
+              </>
+            )}
           </div>
         )}
 

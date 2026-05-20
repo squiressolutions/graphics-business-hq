@@ -166,12 +166,23 @@ export default function ClientRequests() {
                   style={{ background: STATUS_CONFIG[req.status]?.dot || '#aaa', flexShrink: 0 }}
                 />
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, color: 'var(--text)', fontSize: 14 }}>
+                  <div style={{ fontWeight: 600, color: 'var(--text)', fontSize: 14, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     {req.name || 'Unknown'}
-                    {req.business ? <span style={{ color: 'var(--muted)', fontWeight: 400 }}> · {req.business}</span> : null}
+                    {req.business ? <span style={{ color: 'var(--muted)', fontWeight: 400 }}>· {req.business}</span> : null}
+                    {req.type === 'consultation' && (
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, color: '#3DD68C',
+                        background: 'rgba(61,214,140,0.12)', border: '1px solid rgba(61,214,140,0.3)',
+                        borderRadius: 99, padding: '1px 9px', letterSpacing: '0.04em',
+                      }}>
+                        Consultation
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {(req.services || []).join(', ') || 'No services listed'}
+                    {req.type === 'consultation'
+                      ? (req.topic || 'Free consultation request')
+                      : (req.services || []).join(', ') || 'No services listed'}
                   </div>
                 </div>
               </div>
@@ -219,11 +230,25 @@ export default function ClientRequests() {
                         ))}
                       </div>
                     </div>
-                    <DetailLine label="Budget" value={req.budget} />
-                    <DetailLine label="Timeline" value={req.timeline} />
+                    {req.type !== 'consultation' && <DetailLine label="Budget" value={req.budget} />}
+                    {req.type !== 'consultation' && <DetailLine label="Timeline" value={req.timeline} />}
+                    {req.preferredTime && <DetailLine label="Preferred Time" value={req.preferredTime} />}
                     {req.inspiration && <DetailLine label="References" value={req.inspiration} />}
                   </div>
                 </div>
+
+                {req.topic && (
+                  <div style={{ marginTop: 16 }}>
+                    <div className="card-label" style={{ marginBottom: 8 }}>What they want to discuss</div>
+                    <div style={{
+                      background: 'rgba(61,214,140,0.06)', border: '1px solid rgba(61,214,140,0.2)',
+                      borderRadius: 'var(--radius-sm)', padding: '14px 16px',
+                      fontSize: 14, lineHeight: 1.7, color: 'var(--text)', whiteSpace: 'pre-wrap',
+                    }}>
+                      {req.topic}
+                    </div>
+                  </div>
+                )}
 
                 {req.description && (
                   <div style={{ marginTop: 16 }}>
@@ -255,7 +280,9 @@ export default function ClientRequests() {
                   ))}
                   {req.email && (
                     <a
-                      href={`mailto:${req.email}?subject=Re: Your Project Request — Squires Solutions&body=Hi ${req.name},%0D%0A%0D%0AThanks for reaching out to Squires Solutions! I've reviewed your request for ${(req.services || []).join(', ')} and I'd love to discuss next steps.%0D%0A%0D%0A`}
+                      href={req.type === 'consultation'
+                        ? `mailto:${req.email}?subject=Your Free Consultation — Squires Solutions&body=Hi ${req.name},%0D%0A%0D%0AThanks for booking a free consultation with Squires Solutions! I'd love to connect and talk through your project.%0D%0A%0D%0A${req.preferredTime ? `You mentioned you're available: ${req.preferredTime}%0D%0A%0D%0A` : ''}Let me know a time that works best and we'll get it scheduled.%0D%0A%0D%0A`
+                        : `mailto:${req.email}?subject=Re: Your Project Request — Squires Solutions&body=Hi ${req.name},%0D%0A%0D%0AThanks for reaching out to Squires Solutions! I've reviewed your request for ${(req.services || []).join(', ')} and I'd love to discuss next steps.%0D%0A%0D%0A`}
                       className="btn btn-cyan btn-sm"
                       style={{ marginLeft: 'auto' }}
                     >

@@ -495,12 +495,13 @@ Return a JSON object with these exact keys:
 
 app.post('/api/client-intake', (req, res) => {
   const { services, budget, timeline, description, inspiration, hearAbout,
-    name, business, email, phone, website } = req.body;
+    name, business, email, phone, website, type, preferredTime, topic } = req.body;
 
   const entry = {
     id: 'sub_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
     refNum: makeRefNum(),
     status: 'new',
+    type: type || 'project',
     submittedAt: new Date().toISOString(),
     services: Array.isArray(services) ? services : [],
     budget: budget || '',
@@ -513,6 +514,8 @@ app.post('/api/client-intake', (req, res) => {
     email: email || '',
     phone: phone || '',
     website: website || '',
+    preferredTime: preferredTime || '',
+    topic: topic || '',
   };
 
   submissions.unshift(entry);
