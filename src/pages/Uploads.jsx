@@ -65,12 +65,6 @@ export default function Uploads() {
         </div>
       </div>
 
-      {/* Notice */}
-      <div style={{ background: 'rgba(212,160,23,0.07)', border: '1px solid rgba(212,160,23,0.2)', borderRadius: 8, padding: '12px 16px', marginBottom: 20, fontSize: 12, color: 'var(--muted2)', display: 'flex', gap: 8, alignItems: 'center' }}>
-        <span style={{ color: 'var(--accent)', fontWeight: 700 }}>⚠</span>
-        Files are stored on the Render server filesystem. Download important files promptly — they may be cleared on the next deploy. To persist files permanently, connect an S3 or Supabase storage bucket.
-      </div>
-
       {/* Table */}
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         <div className="card-header" style={{ padding: '14px 20px' }}>
