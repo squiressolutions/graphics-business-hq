@@ -231,7 +231,7 @@ export default function ClientPortal() {
                 <h1 style={{ fontFamily:'var(--font-display)', fontSize:36, letterSpacing:'0.06em', color:'var(--text)', lineHeight:1.1, marginBottom:6 }}>KEENAN SQUIRES</h1>
                 <div style={{ fontSize:14, color:'var(--accent)', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:10 }}>Founder · Squires Solutions</div>
                 <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
-                  {['B.S. Graphic Design','Google Certified — SEO & Digital Marketing','Brand Identity','Web Design','Ad Creative'].map(tag => (
+                  {['Stevens — Institute of Business & Arts','B.S. Graphic Design','Google Certified — SEO & Digital Marketing','Web Development','Scrum & Agile','Brand Identity','Ad Creative'].map(tag => (
                     <span key={tag} style={{ fontSize:11, background:'rgba(212,160,23,0.1)', border:'1px solid rgba(212,160,23,0.25)', color:'var(--accent2)', borderRadius:20, padding:'3px 10px' }}>{tag}</span>
                   ))}
                 </div>
@@ -245,7 +245,7 @@ export default function ClientPortal() {
                 <h3 style={{ fontFamily:'var(--font-display)', fontSize:18, letterSpacing:'0.05em', color:'var(--text)' }}>MY STORY</h3>
               </div>
               <p style={{ fontSize:14, color:'var(--muted2)', lineHeight:1.9, marginBottom:14 }}>
-                I'm Keenan Squires — a graphic designer, brand strategist, and the founder of Squires Solutions. With a Bachelor's degree in Graphic Design and a Google certification in SEO & Digital Marketing, I bring both the creative vision and the strategic thinking that modern brands need to stand out.
+                I'm Keenan Squires — a graphic designer, brand strategist, and the founder of Squires Solutions. I graduated from Stevens — The Institute of Business & Arts with a Bachelor's degree in Graphic Design, and hold certifications in SEO & Digital Marketing from Google, Web Development, Scrum Methodology, and Agile. That combination of creative training and technical know-how means I can take a brand from concept all the way to a live, optimized web presence.
               </p>
               <p style={{ fontSize:14, color:'var(--muted2)', lineHeight:1.9 }}>
                 Squires Solutions was built on one belief: every business deserves a brand that looks as good as the work behind it. Whether you're a startup finding your identity or an established business ready for a fresh look, I bring the same level of care, precision, and passion to every project — no matter the size.
@@ -291,10 +291,12 @@ export default function ClientPortal() {
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
                 {[
-                  { title: 'Bachelor of Science — Graphic Design', sub: 'Formal training in visual communication, typography, layout, branding, and design theory.' },
+                  { title: 'B.S. Graphic Design — Stevens, The Institute of Business & Arts', sub: 'Formal training in visual communication, typography, layout, branding, and design theory.' },
                   { title: 'Google Certificate — SEO & Digital Marketing', sub: 'Certified in search engine optimization, digital advertising, analytics, and growth marketing strategy.' },
-                ].map((item, i) => (
-                  <div key={i} style={{ display:'flex', gap:14, alignItems:'flex-start', paddingBottom:14, borderBottom: i === 0 ? '1px solid var(--border)' : 'none' }}>
+                  { title: 'Web Development Certificate', sub: 'Certified in front-end and web development — bringing designs to life with real, functional code.' },
+                  { title: 'Scrum Methodology & Agile Certificate', sub: 'Trained in Agile project management and Scrum frameworks — keeping projects on track, on time, and on budget.' },
+                ].map((item, i, arr) => (
+                  <div key={i} style={{ display:'flex', gap:14, alignItems:'flex-start', paddingBottom:14, borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none' }}>
                     <div style={{ width:8, height:8, borderRadius:'50%', background:'var(--accent)', marginTop:6, flexShrink:0 }} />
                     <div>
                       <div style={{ fontSize:14, fontWeight:700, color:'var(--text)', marginBottom:3 }}>{item.title}</div>
