@@ -187,15 +187,15 @@ export default function ClientRequests() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                 {req.budget && (
                   <span className="badge badge-violet" style={{ fontSize: 11 }}>{req.budget}</span>
                 )}
                 <span className={`badge ${STATUS_CONFIG[req.status]?.cls || 'badge-muted'}`}>
                   {STATUS_CONFIG[req.status]?.label || req.status}
                 </span>
-                <span style={{ fontSize: 12, color: 'var(--muted)', whiteSpace: 'nowrap' }}>{fmtDate(req.submittedAt)}</span>
-                <span style={{ color: 'var(--muted)', fontSize: 16 }}>{expanded === req.id ? '▲' : '▼'}</span>
+                <span className="req-date" style={{ fontSize: 12, color: 'var(--muted)', whiteSpace: 'nowrap' }}>{fmtDate(req.submittedAt)}</span>
+                <span style={{ color: 'var(--muted)', fontSize: 14 }}>{expanded === req.id ? '▲' : '▼'}</span>
               </div>
             </div>
 

@@ -45,6 +45,7 @@
 html, body, #root {
   height: 100%;
   width: 100%;
+  overflow-x: hidden; /* prevent horizontal swipe on mobile */
 }
 
 body {
@@ -81,8 +82,9 @@ a {
 /* --- Layout: App Shell ------------------------------------ */
 .app-shell {
   display: flex;
+  min-height: 100vh;
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Desktop: expanded sidebar */
@@ -97,9 +99,11 @@ a {
 .main-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 36px 40px 80px;
   min-height: 100vh;
   transition: margin-left 0.25s ease;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* --- Mobile Overlay Backdrop ------------------------------ */
@@ -178,12 +182,14 @@ a {
   left: 0;
   width: var(--sidebar-w);
   height: 100vh;
+  height: 100dvh; /* dynamic viewport height — accounts for iOS URL bar */
   background: var(--bg2);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
   z-index: 100;
   transition: width 0.25s ease, transform 0.25s ease;
 }
@@ -428,6 +434,7 @@ a {
 .page {
   max-width: 1100px;
   margin: 0 auto;
+  overflow-x: hidden;
 }
 
 .page-header {
@@ -1287,6 +1294,20 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 600px) {
+  .pill-group {
+    flex-wrap: nowrap; /* horizontal scroll on mobile instead of tall wrap */
+    padding-bottom: 4px;
+  }
+  .pill {
+    flex-shrink: 0;
+    font-size: 12px;
+    padding: 5px 11px;
+  }
 }
 
 .pill {
@@ -2146,18 +2167,19 @@ a {
 .request-row-summary {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 24px;
+  gap: 12px;
+  padding: 14px 20px;
   cursor: pointer;
   transition: background 0.12s;
   user-select: none;
+  min-width: 0;
 }
 
 .request-row-summary:hover { background: rgba(255,255,255,0.02); }
 .request-row.expanded .request-row-summary { background: rgba(212,160,23,0.05); }
 
 .request-row-detail {
-  padding: 20px 24px 24px;
+  padding: 20px;
   border-top: 1px solid var(--border);
   background: rgba(0,0,0,0.15);
 }
@@ -2165,7 +2187,32 @@ a {
 .request-detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 20px;
+}
+
+/* Request rows: responsive */
+@media (max-width: 600px) {
+  .request-row-summary {
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    gap: 8px;
+  }
+  .request-row-detail {
+    padding: 14px;
+  }
+  .request-detail-grid {
+    gap: 14px;
+  }
+  /* Hide date on small screens — keeps row clean */
+  .req-date {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .request-detail-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Portal tabs */
