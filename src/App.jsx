@@ -20,7 +20,7 @@ import ClientRequests from './pages/ClientRequests'
 import Uploads from './pages/Uploads'
 
 // ─── Admin Password Gate ──────────────────────────────────────────────────────
-const ADMIN_PW = import.meta.env.VITE_ADMIN_PASSWORD || 'squires2025'
+const ADMIN_PW = import.meta.env.VITE_ADMIN_PASSWORD || 'Chase0613'
 
 function AdminGate({ children }) {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('admin_auth') === '1')
