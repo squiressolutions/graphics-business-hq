@@ -17,6 +17,7 @@ import ExpenseTracker from './pages/ExpenseTracker'
 import ContractBuilder from './pages/ContractBuilder'
 import ClientPortal from './pages/ClientPortal'
 import ClientRequests from './pages/ClientRequests'
+import Uploads from './pages/Uploads'
 
 function AppShell() {
   const isMobile = () => window.innerWidth < 768
@@ -71,6 +72,7 @@ function AppShell() {
           <Route path="/expenses" element={<ExpenseTracker />} />
           <Route path="/contracts" element={<ContractBuilder />} />
           <Route path="/requests" element={<ClientRequests />} />
+          <Route path="/uploads" element={<Uploads />} />
         </Routes>
         <Footer />
       </main>

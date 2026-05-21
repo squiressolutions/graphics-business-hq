@@ -112,6 +112,7 @@ const UPLOADS_DIR    = join(DATA_DIR, 'uploads');
 const DELIVERIES_DIR = join(DATA_DIR, 'deliveries');
 const SUBMISSIONS_FILE  = join(DATA_DIR, 'submissions.json');
 const DELIVERIES_FILE   = join(DATA_DIR, 'deliveries.json');
+const UPLOADS_META_FILE = join(DATA_DIR, 'uploads.json');
 
 // Ensure directories exist
 mkdirSync(UPLOADS_DIR,    { recursive: true });
@@ -131,8 +132,16 @@ function saveDeliveries(data) {
   try { writeFileSync(DELIVERIES_FILE, JSON.stringify(data, null, 2)); } catch {}
 }
 
-let submissions = loadSubmissions();
-let deliveries  = loadDeliveries();
+function loadUploadsMeta() {
+  try { return JSON.parse(readFileSync(UPLOADS_META_FILE, 'utf8')); } catch { return []; }
+}
+function saveUploadsMeta(data) {
+  try { writeFileSync(UPLOADS_META_FILE, JSON.stringify(data, null, 2)); } catch {}
+}
+
+let submissions  = loadSubmissions();
+let deliveries   = loadDeliveries();
+let uploadsMeta  = loadUploadsMeta();
 
 // ─── Multer (file uploads) ────────────────────────────────────────────────────
 // NOTE: Render's filesystem is ephemeral — files are lost on redeploy.
@@ -896,8 +905,38 @@ app.post('/api/portal/upload', (req, res) => {
       }).catch(err => console.error('[email] upload notification:', err.message));
     }
 
+    // Persist metadata so admin can view uploads
+    const meta = {
+      id: 'upl_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+      clientName:  clientName  || '',
+      clientEmail: clientEmail || '',
+      description: description || '',
+      uploadedAt:  new Date().toISOString(),
+      files: files.map(f => ({
+        originalName: f.originalname,
+        filename:     f.filename,
+        size:         f.size,
+        mimetype:     f.mimetype,
+        url:          `/api/portal/upload-file/${f.filename}`,
+      })),
+    };
+    uploadsMeta.unshift(meta);
+    saveUploadsMeta(uploadsMeta);
+
     res.json({ ok: true, files: files.map(f => ({ name: f.originalname, size: f.size, stored: f.filename })) });
   });
+});
+
+// Admin: list all client uploads
+app.get('/api/portal/uploads', (_req, res) => {
+  res.json(uploadsMeta);
+});
+
+// Download a client-uploaded file
+app.get('/api/portal/upload-file/:filename', (req, res) => {
+  const fp = join(UPLOADS_DIR, req.params.filename);
+  if (!existsSync(fp)) return res.status(404).json({ error: 'File not found.' });
+  res.download(fp);
 });
 
 // ─── Portal: File Deliveries ──────────────────────────────────────────────────

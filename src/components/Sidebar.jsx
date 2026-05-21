@@ -14,6 +14,7 @@ import {
   Wallet,
   FileText,
   Inbox,
+  FolderOpen,
 } from 'lucide-react'
 
 const navSections = [
@@ -44,6 +45,7 @@ const navSections = [
       { to: '/expenses',  icon: Wallet,      label: 'Expenses' },
       { to: '/contracts', icon: FileText,    label: 'Contracts' },
       { to: '/requests',  icon: Inbox,       label: 'Client Requests' },
+      { to: '/uploads',   icon: FolderOpen,  label: 'Client Uploads' },
     ],
   },
 ]
