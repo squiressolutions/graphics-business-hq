@@ -4,7 +4,7 @@ import {
   ShoppingBag, ClipboardList, CreditCard, Palette, PenTool,
   Share2, Monitor, Package, Megaphone, RefreshCw, Lock,
   CheckCircle, Mail, CalendarDays, MessageSquare, Upload,
-  Download, FileText, Image, ExternalLink, Star, X, User, Award, Target, Heart,
+  Download, FileText, Image, ExternalLink, X, User, Award, Target, Heart,
 } from 'lucide-react'
 
 // ─── Portfolio data from behance.net/kc144 ───────────────────────────────────
@@ -23,13 +23,6 @@ const PORTFOLIO = [
   { id: 9, title: 'Blaze Energy Drink Launch Campaign',    cat: 'Digital & Web',         url: 'https://www.behance.net/gallery/244456189/Blaze-Energy-Drink-Launch-Campaign',        thumb: 'https://mir-s3-cdn-cf.behance.net/projects/404/b57bce244456189.Y3JvcCwxMDI0LDgwMCwwLDM2Nw.png' },
 ]
 const PORT_CATS = ['All', 'Logo & Brand Identity', 'Print & Layout', 'Digital & Web']
-
-// ─── Testimonials (placeholder — replace with real client quotes) ─────────────
-const TESTIMONIALS = [
-  { name: 'Alex Rivera',    biz: 'Summit & Stone Realty',  stars: 5, quote: 'Keenan completely transformed our brand. The new identity is clean, professional, and exactly what we needed to stand out in a competitive market. The process was smooth and the results exceeded every expectation.' },
-  { name: 'Maria Chen',     biz: 'Hive Café',              stars: 5, quote: 'We came in needing a rebrand and walked away with a full identity system that truly felt like us. Fast turnaround, excellent communication, and the final work was beyond anything we had imagined.' },
-  { name: 'Jordan Williams', biz: 'Blaze Energy',          stars: 5, quote: 'The campaign visuals Keenan created for our launch were incredible. We saw a measurable lift in engagement from day one and the creative direction was exactly on brand. Highly recommend.' },
-]
 
 // ─── Services for request form ────────────────────────────────────────────────
 const SERVICES_INTAKE = [
@@ -437,25 +430,6 @@ export default function ClientPortal() {
               </div>
             </div>
 
-            {/* Testimonials */}
-            <div style={{ marginBottom:40 }}>
-              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:18 }}>
-                <h3 style={{ fontFamily:'var(--font-display)', fontSize:22, letterSpacing:'0.04em', color:'var(--text)' }}>What Clients Say</h3>
-                <div style={{ flex:1, height:1, background:'var(--border)' }} />
-              </div>
-              <div className="portal-testimonials-grid">
-                {TESTIMONIALS.map((t, i) => (
-                  <div key={i} className="portal-testimonial-card">
-                    <div style={{ display:'flex', gap:2, marginBottom:12 }}>
-                      {Array.from({length:t.stars}).map((_,j) => <Star key={j} size={14} fill="#D4A017" color="#D4A017" />)}
-                    </div>
-                    <p style={{ fontSize:13, color:'var(--muted2)', lineHeight:1.8, fontStyle:'italic', marginBottom:14 }}>"{t.quote}"</p>
-                    <div style={{ fontWeight:700, fontSize:13, color:'var(--text)' }}>{t.name}</div>
-                    <div style={{ fontSize:12, color:'var(--muted)' }}>{t.biz}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         )}
 

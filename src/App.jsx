@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import Footer from './components/Footer'
@@ -18,6 +18,92 @@ import ContractBuilder from './pages/ContractBuilder'
 import ClientPortal from './pages/ClientPortal'
 import ClientRequests from './pages/ClientRequests'
 import Uploads from './pages/Uploads'
+
+// ─── Admin Password Gate ──────────────────────────────────────────────────────
+const ADMIN_PW = import.meta.env.VITE_ADMIN_PASSWORD || 'squires2025'
+
+function AdminGate({ children }) {
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem('admin_auth') === '1')
+  const [input, setInput]   = useState('')
+  const [shake, setShake]   = useState(false)
+  const [hidden, setHidden] = useState(true)
+  const inputRef = useRef(null)
+
+  useEffect(() => { if (!authed) setTimeout(() => inputRef.current?.focus(), 80) }, [authed])
+
+  function submit(e) {
+    e.preventDefault()
+    if (input === ADMIN_PW) {
+      sessionStorage.setItem('admin_auth', '1')
+      setAuthed(true)
+    } else {
+      setShake(true)
+      setInput('')
+      setTimeout(() => setShake(false), 600)
+    }
+  }
+
+  if (authed) return children
+
+  return (
+    <div style={{
+      minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'var(--bg)', padding: '24px',
+    }}>
+      <form onSubmit={submit} style={{
+        background: 'var(--bg2)', border: '1px solid var(--border2)',
+        borderRadius: 16, padding: '40px 36px', width: '100%', maxWidth: 360,
+        textAlign: 'center',
+        animation: shake ? 'adminShake 0.5s ease' : 'none',
+      }}>
+        <div style={{ fontSize: 36, marginBottom: 16 }}>🔐</div>
+        <h2 style={{
+          fontFamily: 'var(--font-display)', fontSize: 22, letterSpacing: '0.06em',
+          color: 'var(--text)', marginBottom: 6,
+        }}>ADMIN ACCESS</h2>
+        <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 28 }}>
+          Squires Solutions · Internal Portal
+        </p>
+        <div style={{ position: 'relative', marginBottom: 16 }}>
+          <input
+            ref={inputRef}
+            type={hidden ? 'password' : 'text'}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder="Enter password"
+            style={{
+              width: '100%', boxSizing: 'border-box',
+              background: 'var(--bg3)', border: '1px solid var(--border2)',
+              borderRadius: 8, padding: '11px 40px 11px 14px',
+              fontSize: 14, color: 'var(--text)', outline: 'none',
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setHidden(h => !h)}
+            style={{
+              position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: 'var(--muted)', fontSize: 13, padding: 0,
+            }}
+          >{hidden ? '👁' : '🙈'}</button>
+        </div>
+        <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+          Unlock
+        </button>
+      </form>
+      <style>{`
+        @keyframes adminShake {
+          0%,100%{transform:translateX(0)}
+          20%{transform:translateX(-8px)}
+          40%{transform:translateX(8px)}
+          60%{transform:translateX(-6px)}
+          80%{transform:translateX(6px)}
+        }
+      `}</style>
+    </div>
+  )
+}
 
 function AppShell() {
   const isMobile = () => window.innerWidth < 768
@@ -86,7 +172,7 @@ export default function App() {
       <Routes>
         <Route path="/portal" element={<ClientPortal />} />
         <Route path="/portal/*" element={<ClientPortal />} />
-        <Route path="/*" element={<AppShell />} />
+        <Route path="/*" element={<AdminGate><AppShell /></AdminGate>} />
       </Routes>
     </BrowserRouter>
   )
