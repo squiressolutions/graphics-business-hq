@@ -177,28 +177,48 @@ export default function ClientPortal() {
   const selectedServices = SERVICES_INTAKE.filter(s => services.includes(s.id))
   const filteredPortfolio = portCat === 'All' ? PORTFOLIO : PORTFOLIO.filter(p => p.cat === portCat)
 
+  const NAV = [
+    { section: 'Services', items: [
+      { key:'services', Icon: ShoppingBag,  label: 'Services & Pricing' },
+      { key:'work',     Icon: Image,        label: 'My Work' },
+    ]},
+    { section: 'Work Together', items: [
+      { key:'intake',  Icon: ClipboardList, label: 'Request a Project' },
+      { key:'consult', Icon: CalendarDays,  label: 'Free Consultation' },
+      { key:'contact', Icon: MessageSquare, label: 'Contact' },
+    ]},
+    { section: 'Client Area', items: [
+      { key:'files', Icon: Upload,    label: 'Files' },
+      { key:'pay',   Icon: CreditCard, label: 'Pay Invoice' },
+    ]},
+  ]
+
   return (
     <div className="portal-shell">
       <PortalHeader />
 
       <div className="portal-body">
-        {/* ── Tab row */}
-        <div className="portal-tab-row">
-          {[
-            { key:'services', Icon: ShoppingBag,    label: 'Services & Pricing' },
-            { key:'work',     Icon: Image,           label: 'Our Work' },
-            { key:'intake',   Icon: ClipboardList,   label: 'Request a Project' },
-            { key:'consult',  Icon: CalendarDays,    label: 'Free Consultation' },
-            { key:'contact',  Icon: MessageSquare,   label: 'Contact' },
-            { key:'files',    Icon: Upload,          label: 'Files' },
-            { key:'pay',      Icon: CreditCard,      label: 'Pay Invoice' },
-          ].map(({ key, Icon: TabIcon, label }) => (
-            <button key={key} className={`portal-tab ${tab===key?'active':''}`}
-              onClick={() => { setTab(key); if(key==='consult') setConsultSubmitted(false) }}>
-              <TabIcon size={14} strokeWidth={1.75} /> {label}
-            </button>
+        {/* ── Left sidebar nav */}
+        <nav className="portal-sidenav">
+          {NAV.map(({ section, items }) => (
+            <div key={section}>
+              <div className="portal-sidenav-label">{section}</div>
+              {items.map(({ key, Icon: NavIcon, label }) => (
+                <button
+                  key={key}
+                  className={`portal-sidenav-item ${tab===key?'active':''}`}
+                  onClick={() => { setTab(key); if(key==='consult') setConsultSubmitted(false) }}
+                >
+                  <NavIcon size={15} strokeWidth={1.75} />
+                  {label}
+                </button>
+              ))}
+            </div>
           ))}
-        </div>
+        </nav>
+
+        {/* ── Right content */}
+        <div className="portal-tab-content">
 
         {/* ══════════════════ SERVICES TAB ══════════════════ */}
         {tab === 'services' && (
@@ -249,46 +269,46 @@ export default function ClientPortal() {
               </div>
             )}
 
-            {catalog.length === 0 && (
-              <div style={{ textAlign:'center', padding:'48px 0', color:'var(--muted)' }}>
-                <div style={{ fontSize:32, marginBottom:12 }}>⟳</div>
-                <p style={{ fontSize:13 }}>Loading services…</p>
+            {/* All services — flat single section */}
+            <div style={{ marginBottom:40 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:18 }}>
+                <h3 style={{ fontFamily:'var(--font-display)', fontSize:22, letterSpacing:'0.04em', color:'var(--text)' }}>Additional Services</h3>
+                <div style={{ flex:1, height:1, background:'var(--border)' }} />
               </div>
-            )}
 
-            {groupedCatalog.map(({ cat, items }) => (
-              <div key={cat} style={{ marginBottom:40 }}>
-                <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:18 }}>
-                  <h3 style={{ fontFamily:'var(--font-display)', fontSize:22, letterSpacing:'0.04em', color:'var(--text)' }}>{CAT[cat]?.label}</h3>
-                  <div style={{ flex:1, height:1, background:'var(--border)' }} />
+              {catalog.length === 0 && (
+                <div style={{ textAlign:'center', padding:'48px 0', color:'var(--muted)' }}>
+                  <div style={{ fontSize:32, marginBottom:12 }}>⟳</div>
+                  <p style={{ fontSize:13 }}>Loading services…</p>
                 </div>
-                <div className="portal-catalog-grid">
-                  {items.map(svc => (
-                    <div key={svc.id} className={`portal-catalog-card ${cat==='package'?'portal-catalog-card--featured':''}`}>
-                      {cat==='package' && svc.id==='studio' && <div className="portal-catalog-badge">Most Popular</div>}
-                      <div className="portal-catalog-name">{svc.name}</div>
-                      <div className="portal-catalog-desc">{svc.description}</div>
-                      <div className="portal-catalog-pricing">
-                        {svc.originalPrice && <div className="portal-catalog-original">{fmt(svc.originalPrice)}</div>}
-                        <div className="portal-catalog-price">{fmt(svc.price)}</div>
-                      </div>
-                      <div style={{ display:'flex', gap:8, marginTop:'auto', paddingTop:16 }}>
-                        {stripeConfigured ? (
-                          <button className="portal-btn portal-btn-primary" style={{ flex:1, justifyContent:'center', fontSize:13 }}
-                            onClick={() => { setShowEmailFor(svc.id); setCheckoutError(null) }}
-                            disabled={!!checkoutLoading}>
-                            {checkoutLoading===svc.id ? <><span className="portal-spinner"/>…</> : 'Buy Now'}
-                          </button>
-                        ) : (
-                          <a href="mailto:squiressolutions@gmail.com?subject=Service Inquiry" className="portal-btn portal-btn-primary" style={{ flex:1, justifyContent:'center', fontSize:13, textAlign:'center' }}>Get Started</a>
-                        )}
-                        <button className="portal-btn portal-btn-ghost" style={{ fontSize:13 }} onClick={() => setTab('intake')}>Request Quote</button>
-                      </div>
+              )}
+
+              <div className="portal-catalog-grid">
+                {catalog.filter(s => !HIDDEN_IDS.includes(s.id)).map(svc => (
+                  <div key={svc.id} className={`portal-catalog-card ${svc.id==='studio'?'portal-catalog-card--featured':''}`}>
+                    {svc.id==='studio' && <div className="portal-catalog-badge">Most Popular</div>}
+                    <div className="portal-catalog-name">{svc.name}</div>
+                    <div className="portal-catalog-desc">{svc.description}</div>
+                    <div className="portal-catalog-pricing">
+                      {svc.originalPrice && <div className="portal-catalog-original">{fmt(svc.originalPrice)}</div>}
+                      <div className="portal-catalog-price">{fmt(svc.price)}</div>
                     </div>
-                  ))}
-                </div>
+                    <div style={{ display:'flex', gap:8, marginTop:'auto', paddingTop:16 }}>
+                      {stripeConfigured ? (
+                        <button className="portal-btn portal-btn-primary" style={{ flex:1, justifyContent:'center', fontSize:13 }}
+                          onClick={() => { setShowEmailFor(svc.id); setCheckoutError(null) }}
+                          disabled={!!checkoutLoading}>
+                          {checkoutLoading===svc.id ? <><span className="portal-spinner"/>…</> : 'Buy Now'}
+                        </button>
+                      ) : (
+                        <a href="mailto:squiressolutions@gmail.com?subject=Service Inquiry" className="portal-btn portal-btn-primary" style={{ flex:1, justifyContent:'center', fontSize:13, textAlign:'center' }}>Get Started</a>
+                      )}
+                      <button className="portal-btn portal-btn-ghost" style={{ fontSize:13 }} onClick={() => setTab('intake')}>Request Quote</button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
 
             {/* Website Tier — special card */}
             <div style={{ marginBottom:40 }}>
@@ -305,9 +325,10 @@ export default function ClientPortal() {
                     </div>
                   </div>
                   <div style={{ textAlign:'right', flexShrink:0 }}>
-                    <div style={{ fontSize:38, fontFamily:'var(--font-display)', color:'var(--accent)', letterSpacing:'0.02em' }}>$670</div>
-                    <div style={{ fontSize:13, color:'var(--muted)' }}>upfront build</div>
-                    <div style={{ fontSize:16, color:'var(--accent2)', fontWeight:700, marginTop:4 }}>+ $40 / mo</div>
+                    <div style={{ fontSize:14, color:'var(--red)', textDecoration:'line-through', marginBottom:2 }}>$1,297</div>
+                    <div style={{ fontSize:38, fontFamily:'var(--font-display)', color:'var(--accent)', letterSpacing:'0.02em', lineHeight:1 }}>$670</div>
+                    <div style={{ fontSize:13, color:'var(--muted)', marginTop:2 }}>upfront build</div>
+                    <div style={{ fontSize:16, color:'var(--accent2)', fontWeight:700, marginTop:6 }}>+ $40 / mo</div>
                     <div style={{ fontSize:11, color:'var(--muted)' }}>hosting & support</div>
                   </div>
                 </div>
@@ -349,7 +370,7 @@ export default function ClientPortal() {
         {tab === 'work' && (
           <div>
             <div className="portal-step-header" style={{ marginBottom:24 }}>
-              <h2 className="portal-step-title">Our Work</h2>
+              <h2 className="portal-step-title">My Work</h2>
               <p className="portal-step-sub">
                 A selection of recent projects from{' '}
                 <a href="https://www.behance.net/kc144" target="_blank" rel="noreferrer" style={{ color:'var(--accent)', textDecoration:'none' }}>
@@ -727,7 +748,8 @@ export default function ClientPortal() {
             </div>
           </div>
         )}
-      </div>
+        </div>{/* end portal-tab-content */}
+      </div>{/* end portal-body */}
 
       <PortalFooter />
     </div>
