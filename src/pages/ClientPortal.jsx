@@ -4,7 +4,7 @@ import {
   ShoppingBag, ClipboardList, CreditCard, Palette, PenTool,
   Share2, Monitor, Package, Megaphone, RefreshCw, Lock,
   CheckCircle, Mail, CalendarDays, MessageSquare, Upload,
-  Download, FileText, Image, ExternalLink, Star, X,
+  Download, FileText, Image, ExternalLink, Star, X, User, Award, Target, Heart,
 } from 'lucide-react'
 
 // ─── Portfolio data from behance.net/kc144 ───────────────────────────────────
@@ -70,7 +70,7 @@ export default function ClientPortal() {
   const [searchParams] = useSearchParams()
   const paymentStatus = searchParams.get('payment')
   const paidService   = searchParams.get('service')
-  const [tab, setTab] = useState(paymentStatus ? 'pay' : 'services')
+  const [tab, setTab] = useState(paymentStatus ? 'pay' : 'about')
 
   // ── Catalog from API
   const [catalog, setCatalog]                   = useState([])
@@ -179,6 +179,7 @@ export default function ClientPortal() {
 
   const NAV = [
     { section: 'Services', items: [
+      { key:'about',    Icon: User,         label: 'About' },
       { key:'services', Icon: ShoppingBag,  label: 'Services & Pricing' },
       { key:'work',     Icon: Image,        label: 'My Work' },
     ]},
@@ -219,6 +220,101 @@ export default function ClientPortal() {
 
         {/* ── Right content */}
         <div className="portal-tab-content">
+
+        {/* ══════════════════ ABOUT TAB ══════════════════ */}
+        {tab === 'about' && (
+          <div>
+            {/* Hero */}
+            <div style={{ display:'flex', alignItems:'center', gap:28, marginBottom:40, flexWrap:'wrap' }}>
+              <img src="/logo.png" alt="Squires Solutions" style={{ width:96, height:96, objectFit:'contain', borderRadius:16, background:'#111', padding:10, flexShrink:0 }} />
+              <div>
+                <h1 style={{ fontFamily:'var(--font-display)', fontSize:36, letterSpacing:'0.06em', color:'var(--text)', lineHeight:1.1, marginBottom:6 }}>KEENAN SQUIRES</h1>
+                <div style={{ fontSize:14, color:'var(--accent)', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:10 }}>Founder · Squires Solutions</div>
+                <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                  {['B.S. Graphic Design','Google Certified — SEO & Digital Marketing','Brand Identity','Web Design','Ad Creative'].map(tag => (
+                    <span key={tag} style={{ fontSize:11, background:'rgba(212,160,23,0.1)', border:'1px solid rgba(212,160,23,0.25)', color:'var(--accent2)', borderRadius:20, padding:'3px 10px' }}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bio */}
+            <div className="portal-card" style={{ marginBottom:24 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
+                <User size={16} color="var(--accent)" />
+                <h3 style={{ fontFamily:'var(--font-display)', fontSize:18, letterSpacing:'0.05em', color:'var(--text)' }}>MY STORY</h3>
+              </div>
+              <p style={{ fontSize:14, color:'var(--muted2)', lineHeight:1.9, marginBottom:14 }}>
+                I'm Keenan Squires — a graphic designer, brand strategist, and the founder of Squires Solutions. With a Bachelor's degree in Graphic Design and a Google certification in SEO & Digital Marketing, I bring both the creative vision and the strategic thinking that modern brands need to stand out.
+              </p>
+              <p style={{ fontSize:14, color:'var(--muted2)', lineHeight:1.9 }}>
+                Squires Solutions was built on one belief: every business deserves a brand that looks as good as the work behind it. Whether you're a startup finding your identity or an established business ready for a fresh look, I bring the same level of care, precision, and passion to every project — no matter the size.
+              </p>
+            </div>
+
+            {/* Values grid */}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:16, marginBottom:24 }}>
+              <div className="portal-card" style={{ borderTop:'2px solid var(--accent)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
+                  <Heart size={16} color="var(--accent)" />
+                  <div style={{ fontWeight:700, fontSize:13, color:'var(--text)' }}>People First</div>
+                </div>
+                <p style={{ fontSize:13, color:'var(--muted2)', lineHeight:1.8 }}>
+                  I genuinely care about the people I work with. My goal isn't just to deliver a logo — it's to help your business grow and make sure you walk away confident and proud of what we built together.
+                </p>
+              </div>
+              <div className="portal-card" style={{ borderTop:'2px solid var(--accent)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
+                  <Target size={16} color="var(--accent)" />
+                  <div style={{ fontWeight:700, fontSize:13, color:'var(--text)' }}>Everyone Wins</div>
+                </div>
+                <p style={{ fontSize:13, color:'var(--muted2)', lineHeight:1.8 }}>
+                  I don't measure success by what I produce — I measure it by your results. When your brand connects with your audience and drives real outcomes, that's the win I'm after. Your success is my success.
+                </p>
+              </div>
+              <div className="portal-card" style={{ borderTop:'2px solid var(--accent)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
+                  <Award size={16} color="var(--accent)" />
+                  <div style={{ fontWeight:700, fontSize:13, color:'var(--text)' }}>Quality Without Compromise</div>
+                </div>
+                <p style={{ fontSize:13, color:'var(--muted2)', lineHeight:1.8 }}>
+                  Every project gets my full attention — from first brief to final file. I combine design fundamentals with modern strategy to make sure what I deliver isn't just beautiful, but built to perform.
+                </p>
+              </div>
+            </div>
+
+            {/* Credentials */}
+            <div className="portal-card" style={{ marginBottom:24 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
+                <Award size={16} color="var(--accent)" />
+                <h3 style={{ fontFamily:'var(--font-display)', fontSize:18, letterSpacing:'0.05em', color:'var(--text)' }}>EDUCATION & CREDENTIALS</h3>
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                {[
+                  { title: 'Bachelor of Science — Graphic Design', sub: 'Formal training in visual communication, typography, layout, branding, and design theory.' },
+                  { title: 'Google Certificate — SEO & Digital Marketing', sub: 'Certified in search engine optimization, digital advertising, analytics, and growth marketing strategy.' },
+                ].map((item, i) => (
+                  <div key={i} style={{ display:'flex', gap:14, alignItems:'flex-start', paddingBottom:14, borderBottom: i === 0 ? '1px solid var(--border)' : 'none' }}>
+                    <div style={{ width:8, height:8, borderRadius:'50%', background:'var(--accent)', marginTop:6, flexShrink:0 }} />
+                    <div>
+                      <div style={{ fontSize:14, fontWeight:700, color:'var(--text)', marginBottom:3 }}>{item.title}</div>
+                      <div style={{ fontSize:13, color:'var(--muted2)', lineHeight:1.7 }}>{item.sub}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+              <button className="portal-btn portal-btn-primary" onClick={() => setTab('intake')}>Start a Project →</button>
+              <button className="portal-btn portal-btn-ghost" onClick={() => { setTab('consult'); setConsultSubmitted(false) }}>Book a Free Consultation</button>
+              <a href="https://www.behance.net/kc144" target="_blank" rel="noreferrer" className="portal-btn portal-btn-ghost">
+                <ExternalLink size={13} style={{ marginRight:4 }} /> View My Work on Behance
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* ══════════════════ SERVICES TAB ══════════════════ */}
         {tab === 'services' && (
