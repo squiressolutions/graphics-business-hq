@@ -47,7 +47,7 @@ export default function Uploads() {
       </div>
 
       {/* Stats */}
-      <div className="stats-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+      <div className="stats-row stats-row--3">
         <div className="stat-card stat-card-accent">
           <div className="card-label">Submissions</div>
           <div className="card-value">{loading ? '—' : uploads.length}</div>

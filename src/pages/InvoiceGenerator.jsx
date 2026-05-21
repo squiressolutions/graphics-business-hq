@@ -262,14 +262,7 @@ export default function InvoiceGenerator() {
 
       {/* ── TAB 1: Create Invoice ── */}
       {tab === 'create' && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
-            gap: '24px',
-            alignItems: 'start',
-          }}
-        >
+        <div className="invoice-create-pane">
           {/* Left: Form */}
           <div className="card">
             <div className="card-header">
@@ -390,7 +383,8 @@ export default function InvoiceGenerator() {
                 Line Items
               </div>
 
-              {/* Column headers */}
+              {/* Column headers — scrolls horizontally on mobile */}
+              <div className="line-items-scroll">
               <div
                 style={{
                   display: 'grid',
@@ -398,6 +392,7 @@ export default function InvoiceGenerator() {
                   gap: '8px',
                   marginBottom: '6px',
                   paddingLeft: '4px',
+                  minWidth: '360px',
                 }}
               >
                 {['Description', 'Qty', 'Unit Price', 'Amount', ''].map(h => (
@@ -421,6 +416,7 @@ export default function InvoiceGenerator() {
                       gap: '8px',
                       marginBottom: '8px',
                       alignItems: 'center',
+                      minWidth: '360px',
                     }}
                   >
                     <input
@@ -484,6 +480,7 @@ export default function InvoiceGenerator() {
               >
                 + Add Line Item
               </button>
+              </div>{/* end line-items-scroll */}
             </div>
 
             <hr className="divider" />

@@ -335,15 +335,7 @@ export default function ClientTracker() {
       )}
 
       {/* Stats row */}
-      <div
-        className="stats-row"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '16px',
-          marginBottom: '24px',
-        }}
-      >
+      <div className="stats-row">
         {[
           { label: 'Total Clients', value: total, color: 'var(--accent)' },
           { label: 'Active', value: activeCount, color: '#4ade80' },

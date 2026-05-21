@@ -92,7 +92,7 @@ export default function ClientRequests() {
       </div>
 
       {/* Stats */}
-      <div className="stats-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      <div className="stats-row">
         <div className="stat-card stat-card-accent">
           <div className="card-label">Total</div>
           <div className="card-value">{stats.total}</div>

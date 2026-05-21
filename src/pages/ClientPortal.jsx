@@ -225,7 +225,7 @@ export default function ClientPortal() {
         {tab === 'about' && (
           <div>
             {/* Hero */}
-            <div style={{ display:'flex', alignItems:'center', gap:28, marginBottom:40, flexWrap:'wrap' }}>
+            <div className="portal-about-hero" style={{ display:'flex', alignItems:'center', gap:28, marginBottom:40, flexWrap:'wrap' }}>
               <img src="/logo.png" alt="Squires Solutions" style={{ width:96, height:96, objectFit:'contain', borderRadius:16, background:'#111', padding:10, flexShrink:0 }} />
               <div>
                 <h1 style={{ fontFamily:'var(--font-display)', fontSize:36, letterSpacing:'0.06em', color:'var(--text)', lineHeight:1.1, marginBottom:6 }}>KEENAN SQUIRES</h1>
@@ -308,7 +308,7 @@ export default function ClientPortal() {
             </div>
 
             {/* CTA */}
-            <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+            <div className="portal-cta-row" style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
               <button className="portal-btn portal-btn-primary" onClick={() => setTab('intake')}>Start a Project →</button>
               <button className="portal-btn portal-btn-ghost" onClick={() => { setTab('consult'); setConsultSubmitted(false) }}>Book a Free Consultation</button>
               <a href="https://www.behance.net/kc144" target="_blank" rel="noreferrer" className="portal-btn portal-btn-ghost">

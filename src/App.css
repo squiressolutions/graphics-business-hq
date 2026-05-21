@@ -477,6 +477,8 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
@@ -1019,10 +1021,22 @@ a {
   margin-bottom: 24px;
 }
 
+/* 3-stat variant (ExpenseTracker, Uploads) */
+.stats-row--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 @media (max-width: 960px) {
-  .stats-row {
-    grid-template-columns: 1fr 1fr;
-  }
+  .stats-row               { grid-template-columns: 1fr 1fr; }
+  .stats-row--3            { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .stats-row, .stats-row--3 { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 400px) {
+  .stats-row, .stats-row--3 { grid-template-columns: 1fr; }
 }
 
 /* --- Quick Action Grid ------------------------------------ */
@@ -1031,6 +1045,13 @@ a {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 24px;
+}
+
+@media (max-width: 640px) {
+  .action-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 400px) {
+  .action-grid { grid-template-columns: 1fr; }
 }
 
 .action-card {
@@ -2483,4 +2504,99 @@ abbr[title="required"] {
 .portal-required {
   color: #F5C518;
   font-weight: 700;
+}
+
+/* ── Invoice Generator ─────────────────────────────────────── */
+.invoice-create-pane {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .invoice-create-pane {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Line items: scroll horizontally on narrow screens */
+.line-items-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 12px;
+}
+
+/* ── Global mobile improvements ────────────────────────────── */
+
+/* Tighter side padding on very small phones */
+@media (max-width: 400px) {
+  .main-content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .card {
+    padding: 14px;
+  }
+}
+
+/* ── Portal mobile enhancements ────────────────────────────── */
+
+/* Shrink portal header on small phones */
+@media (max-width: 480px) {
+  .portal-header-inner {
+    height: 52px;
+  }
+  .portal-logo-name {
+    font-size: 15px;
+  }
+  .portal-logo-sub {
+    display: none;
+  }
+}
+
+/* Tighter portal card on phones */
+@media (max-width: 480px) {
+  .portal-card {
+    padding: 18px 14px;
+  }
+  .portal-step-title {
+    font-size: 22px;
+  }
+}
+
+/* Portal progress: shrink dots on small screens */
+@media (max-width: 400px) {
+  .portal-progress-dot {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+}
+
+/* Portal sidenav items: smaller on mobile */
+@media (max-width: 768px) {
+  .portal-sidenav-item {
+    font-size: 12px;
+    padding: 7px 11px;
+  }
+}
+
+/* Portal about hero: stack on very small screens */
+@media (max-width: 420px) {
+  .portal-about-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Portal CTA buttons: stack on phone */
+@media (max-width: 480px) {
+  .portal-cta-row {
+    flex-direction: column;
+  }
+  .portal-cta-row .portal-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }

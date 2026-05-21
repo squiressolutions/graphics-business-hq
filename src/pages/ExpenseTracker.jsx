@@ -150,7 +150,7 @@ export default function ExpenseTracker() {
       </div>
 
       {/* Stats */}
-      <div className="stats-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+      <div className="stats-row stats-row--3">
         <div className="stat-card stat-card-accent">
           <div className="card-label">Total (All Time)</div>
           <div className="card-value" style={{ fontSize: 24 }}>{fmt(totalAll)}</div>
