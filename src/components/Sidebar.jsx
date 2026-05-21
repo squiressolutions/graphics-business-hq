@@ -55,7 +55,7 @@ export default function Sidebar({ isOpen, onToggle }) {
     <aside className="sidebar">
       <div className="sidebar-logo">
         <Link to="/dashboard" className="sidebar-logo-mark" style={{ textDecoration: 'none' }}>
-          <div className="sidebar-logo-icon">◈</div>
+          <img src="/logo.png" alt="Squires Solutions" className="sidebar-logo-icon" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 4 }} />
           {isOpen && (
             <div className="sidebar-logo-text-wrap">
               <div className="sidebar-logo-text">SQUIRES</div>
@@ -101,7 +101,7 @@ export default function Sidebar({ isOpen, onToggle }) {
             <div style={{ fontSize: 10, color: 'var(--border2)' }}>v1.2.0 · 8 Agents</div>
           </>
         ) : (
-          <div style={{ fontSize: 10, color: 'var(--border2)', textAlign: 'center' }}>SS</div>
+          <img src="/logo.png" alt="SS" style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 3, opacity: 0.6 }} />
         )}
       </div>
     </aside>

@@ -1040,7 +1040,7 @@ function PortalHeader() {
     <header className="portal-header">
       <div className="portal-header-inner">
         <a href="/portal" className="portal-logo" style={{ textDecoration:'none' }}>
-          <div className="portal-logo-mark">◈</div>
+          <img src="/logo.png" alt="Squires Solutions" style={{ width: 38, height: 38, objectFit: 'contain', borderRadius: 4 }} />
           <div>
             <div className="portal-logo-name">SQUIRES SOLUTIONS</div>
             <div className="portal-logo-sub">Creative & Brand Design</div>
@@ -1058,7 +1058,10 @@ function PortalFooter() {
   return (
     <footer className="portal-footer">
       <div className="portal-footer-inner" style={{ flexDirection:'column', gap:12, textAlign:'center' }}>
-        <div style={{ fontFamily:'var(--font-display)', fontSize:18, letterSpacing:'2px', color:'var(--accent)' }}>SQUIRES SOLUTIONS</div>
+        <div style={{ display:'flex', alignItems:'center', gap:10, justifyContent:'center' }}>
+          <img src="/logo.png" alt="Squires Solutions" style={{ width:28, height:28, objectFit:'contain', borderRadius:3 }} />
+          <div style={{ fontFamily:'var(--font-display)', fontSize:18, letterSpacing:'2px', color:'var(--accent)' }}>SQUIRES SOLUTIONS</div>
+        </div>
         <div style={{ display:'flex', gap:20, justifyContent:'center', flexWrap:'wrap' }}>
           <a href="mailto:squiressolutions@gmail.com" style={{ display:'flex', alignItems:'center', gap:5, color:'var(--muted2)', fontSize:12, textDecoration:'none' }}>
             <Mail size={13} /> squiressolutions@gmail.com
