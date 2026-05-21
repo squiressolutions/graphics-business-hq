@@ -168,7 +168,7 @@ export default function ContractBuilder() {
                 <div className="form-group">
                   <label className="form-label">Client Name</label>
                   <input type="text" name="clientName" className="form-input" value={form.clientName} onChange={change}
-                    placeholder="Jane Smith" required />
+                    placeholder="Estefany Squires" required />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Client Email</label>

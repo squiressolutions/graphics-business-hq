@@ -610,7 +610,7 @@ export default function ClientPortal() {
                     <div className="portal-grid-2">
                       <div className="portal-form-group">
                         <label className="portal-label">Your Name <span className="portal-required">*</span></label>
-                        <input type="text" name="name" className="portal-input" value={contact.name} onChange={contactChange} placeholder="Jane Smith" />
+                        <input type="text" name="name" className="portal-input" value={contact.name} onChange={contactChange} placeholder="Estefany Squires" />
                       </div>
                       <div className="portal-form-group">
                         <label className="portal-label">Business / Brand Name</label>
@@ -1021,7 +1021,7 @@ function FilesTab() {
 
           <div className="portal-form-group" style={{ marginTop:14 }}>
             <label className="portal-label">Your Name <span className="portal-required">*</span></label>
-            <input type="text" className="portal-input" value={clientName} onChange={e=>setClientName(e.target.value)} placeholder="Jane Smith" />
+            <input type="text" className="portal-input" value={clientName} onChange={e=>setClientName(e.target.value)} placeholder="Estefany Squires" />
           </div>
           <div className="portal-form-group">
             <label className="portal-label">Your Email</label>
