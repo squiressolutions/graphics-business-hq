@@ -269,6 +269,40 @@ export default function ClientPortal() {
               </div>
             )}
 
+            {/* Website Tier — special card (first) */}
+            <div style={{ marginBottom:40 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:18 }}>
+                <h3 style={{ fontFamily:'var(--font-display)', fontSize:22, letterSpacing:'0.04em', color:'var(--text)' }}>Website</h3>
+                <div style={{ flex:1, height:1, background:'var(--border)' }} />
+              </div>
+              <div className="portal-website-card">
+                <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:16, marginBottom:16 }}>
+                  <div>
+                    <div style={{ fontFamily:'var(--font-display)', fontSize:22, letterSpacing:'0.04em', color:'var(--text)', marginBottom:6 }}>Custom Website Build</div>
+                    <div style={{ fontSize:13, color:'var(--muted2)', lineHeight:1.7, maxWidth:440 }}>
+                      A fully custom website built to represent your brand. Includes design, development, and launch. The monthly fee covers hosting, updates, and ongoing support.
+                    </div>
+                  </div>
+                  <div style={{ textAlign:'right', flexShrink:0 }}>
+                    <div style={{ fontSize:14, color:'var(--red)', textDecoration:'line-through', marginBottom:2 }}>$997</div>
+                    <div style={{ fontSize:38, fontFamily:'var(--font-display)', color:'var(--accent)', letterSpacing:'0.02em', lineHeight:1 }}>$600</div>
+                    <div style={{ fontSize:13, color:'var(--muted)', marginTop:2 }}>upfront build</div>
+                    <div style={{ fontSize:16, color:'var(--accent2)', fontWeight:700, marginTop:6 }}>+ $63 / mo</div>
+                    <div style={{ fontSize:11, color:'var(--muted)' }}>hosting & support</div>
+                  </div>
+                </div>
+                <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:20 }}>
+                  {['Custom design (up to 5 pages)','Mobile responsive','SEO-ready structure','Contact form & integrations','Monthly content updates','Hosting & maintenance'].map(f => (
+                    <span key={f} style={{ fontSize:12, background:'rgba(212,160,23,0.1)', border:'1px solid rgba(212,160,23,0.25)', color:'var(--accent2)', borderRadius:20, padding:'3px 10px' }}>✓ {f}</span>
+                  ))}
+                </div>
+                <div style={{ display:'flex', gap:10 }}>
+                  <button className="portal-btn portal-btn-primary" onClick={() => setTab('intake')}>Get a Quote →</button>
+                  <button className="portal-btn portal-btn-ghost" onClick={() => { setTab('consult'); setConsultSubmitted(false) }}>Book a Call</button>
+                </div>
+              </div>
+            </div>
+
             {/* All services — flat single section */}
             <div style={{ marginBottom:40 }}>
               <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:18 }}>
@@ -307,40 +341,6 @@ export default function ClientPortal() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* Website Tier — special card */}
-            <div style={{ marginBottom:40 }}>
-              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:18 }}>
-                <h3 style={{ fontFamily:'var(--font-display)', fontSize:22, letterSpacing:'0.04em', color:'var(--text)' }}>Website</h3>
-                <div style={{ flex:1, height:1, background:'var(--border)' }} />
-              </div>
-              <div className="portal-website-card">
-                <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:16, marginBottom:16 }}>
-                  <div>
-                    <div style={{ fontFamily:'var(--font-display)', fontSize:22, letterSpacing:'0.04em', color:'var(--text)', marginBottom:6 }}>Custom Website Build</div>
-                    <div style={{ fontSize:13, color:'var(--muted2)', lineHeight:1.7, maxWidth:440 }}>
-                      A fully custom website built to represent your brand. Includes design, development, and launch. The monthly fee covers hosting, updates, and ongoing support.
-                    </div>
-                  </div>
-                  <div style={{ textAlign:'right', flexShrink:0 }}>
-                    <div style={{ fontSize:14, color:'var(--red)', textDecoration:'line-through', marginBottom:2 }}>$1,297</div>
-                    <div style={{ fontSize:38, fontFamily:'var(--font-display)', color:'var(--accent)', letterSpacing:'0.02em', lineHeight:1 }}>$670</div>
-                    <div style={{ fontSize:13, color:'var(--muted)', marginTop:2 }}>upfront build</div>
-                    <div style={{ fontSize:16, color:'var(--accent2)', fontWeight:700, marginTop:6 }}>+ $40 / mo</div>
-                    <div style={{ fontSize:11, color:'var(--muted)' }}>hosting & support</div>
-                  </div>
-                </div>
-                <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:20 }}>
-                  {['Custom design (up to 5 pages)','Mobile responsive','SEO-ready structure','Contact form & integrations','Monthly content updates','Hosting & maintenance'].map(f => (
-                    <span key={f} style={{ fontSize:12, background:'rgba(212,160,23,0.1)', border:'1px solid rgba(212,160,23,0.25)', color:'var(--accent2)', borderRadius:20, padding:'3px 10px' }}>✓ {f}</span>
-                  ))}
-                </div>
-                <div style={{ display:'flex', gap:10 }}>
-                  <button className="portal-btn portal-btn-primary" onClick={() => setTab('intake')}>Get a Quote →</button>
-                  <button className="portal-btn portal-btn-ghost" onClick={() => { setTab('consult'); setConsultSubmitted(false) }}>Book a Call</button>
-                </div>
               </div>
             </div>
 

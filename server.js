@@ -40,10 +40,10 @@ export const SERVICE_CATALOG = [
   { id: 'studio',        name: 'Studio Package',        price: 119700, originalPrice: 150000, category: 'package',  description: 'Logo (3 concepts), color palette, typography, social media kit, brand guidelines PDF, 4 revision rounds.' },
   { id: 'agency',        name: 'Agency Package',        price: 369700, originalPrice: 520000, category: 'package',  description: 'Logo (5 concepts), full brand identity, social kit, guidelines, source files, unlimited revisions.' },
   // ── À la carte services ───────────────────────────────────────────────────
-  { id: 'brand-identity',   name: 'Brand Identity',       price: 119700, originalPrice: 150000, category: 'service', description: 'Full brand system — logo, colors, typography, guidelines.' },
-  { id: 'logo-design',      name: 'Logo Design',           price: 49700,  originalPrice: 65000,  category: 'service', description: 'Professional logo concepts with revisions & source files.' },
+  { id: 'brand-identity',   name: 'Brand Identity',       price: 23500,  originalPrice: 55000,  category: 'service', description: 'Full brand system — logo, colors, typography, guidelines.' },
+  { id: 'logo-design',      name: 'Logo Design',           price: 25000,  originalPrice: 49000,  category: 'service', description: 'Professional logo concepts with revisions & source files.' },
   { id: 'social-media-kit', name: 'Social Media Kit',      price: 39900,  originalPrice: 50000,  category: 'service', description: 'Templates & graphics for Instagram, TikTok, Facebook.' },
-  { id: 'website-design',   name: 'Website Design',        price: 129900, originalPrice: 180000, category: 'service', description: 'UI/UX mockups, landing pages & full site designs (up to 5 pages).' },
+  { id: 'website-design',   name: 'Website Design',        price: 119900, originalPrice: 180000, category: 'service', description: 'UI/UX mockups, landing pages & full site designs (up to 5 pages).' },
   { id: 'print-design',     name: 'Print & Packaging',     price: 79900,  originalPrice: 100000, category: 'service', description: 'Business cards, flyers, packaging, signage & more.' },
   { id: 'ad-creative',      name: 'Ad Creative',           price: 29900,  originalPrice: 40000,  category: 'service', description: 'Meta, TikTok & Google ad graphics and copy.' },
   { id: 'motion-graphics',  name: 'Motion Graphics',       price: 59900,  originalPrice: 80000,  category: 'service', description: 'Animated logos, video intros, reels & short-form content.' },
