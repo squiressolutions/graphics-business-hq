@@ -46,7 +46,7 @@ const SERVICES_INTAKE = [
 const HIDDEN_IDS = ['motion-graphics', 'logo-animation', 'photo-direction']
 
 const BUDGETS   = ['Under $500','$500 – $1,000','$1,000 – $2,500','$2,500 – $5,000','$5,000 – $10,000','$10,000+','Not sure yet']
-const TIMELINES = ['ASAP (rush)','1 – 2 weeks','2 – 4 weeks','1 – 2 months','2 – 3 months','Flexible']
+const TIMELINES = ['ASAP (rush) +$50','1 – 2 weeks','2 – 4 weeks','1 – 2 months','2 – 3 months','Flexible']
 const HEAR_ABOUT = ['Google Search','Instagram','TikTok','Referral / Word of mouth','LinkedIn','Other']
 
 const FILE_ACCEPT = '.png,.jpg,.jpeg,.pdf'
@@ -229,12 +229,7 @@ export default function ClientPortal() {
               <img src="/logo.png" alt="Squires Solutions" style={{ width:96, height:96, objectFit:'contain', borderRadius:16, background:'#111', padding:10, flexShrink:0 }} />
               <div>
                 <h1 style={{ fontFamily:'var(--font-display)', fontSize:36, letterSpacing:'0.06em', color:'var(--text)', lineHeight:1.1, marginBottom:6 }}>KEENAN SQUIRES</h1>
-                <div style={{ fontSize:14, color:'var(--accent)', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:10 }}>Founder · Squires Solutions</div>
-                <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
-                  {['Stevens — Institute of Business & Arts','B.S. Graphic Design','Google Certified — SEO & Digital Marketing','Web Development','Scrum & Agile','Brand Identity','Ad Creative'].map(tag => (
-                    <span key={tag} style={{ fontSize:11, background:'rgba(212,160,23,0.1)', border:'1px solid rgba(212,160,23,0.25)', color:'var(--accent2)', borderRadius:20, padding:'3px 10px' }}>{tag}</span>
-                  ))}
-                </div>
+                <div style={{ fontSize:14, color:'var(--accent)', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase' }}>Founder · Squires Solutions</div>
               </div>
             </div>
 
@@ -585,6 +580,12 @@ export default function ClientPortal() {
                     <div className="portal-form-group">
                       <label className="portal-label">Timeline</label>
                       <div className="portal-pill-row">{TIMELINES.map(t => <button key={t} type="button" className={`portal-pill ${project.timeline===t?'selected':''}`} onClick={() => setProject(p=>({...p,timeline:t}))}>{t}</button>)}</div>
+                      {project.timeline === 'ASAP (rush) +$50' && (
+                        <div style={{ marginTop:10, display:'flex', alignItems:'center', gap:8, background:'rgba(245,158,11,0.1)', border:'1px solid rgba(245,158,11,0.3)', borderRadius:8, padding:'10px 14px', fontSize:13, color:'var(--orange)' }}>
+                          <span style={{ fontSize:16 }}>⚡</span>
+                          <span><strong>Rush fee applies:</strong> A $50 rush fee will be added to your project total for expedited turnaround.</span>
+                        </div>
+                      )}
                     </div>
                     <div className="portal-form-group">
                       <label className="portal-label">Project Description <span className="portal-required">*</span></label>
