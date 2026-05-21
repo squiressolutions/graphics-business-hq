@@ -318,7 +318,7 @@ export default function InvoiceGenerator() {
                 name="clientName"
                 value={form.clientName}
                 onChange={handleFormChange}
-                placeholder="Jane Doe"
+                placeholder="Estefany Squires"
               />
             </div>
             <div className="form-group">
@@ -329,7 +329,7 @@ export default function InvoiceGenerator() {
                 type="email"
                 value={form.clientEmail}
                 onChange={handleFormChange}
-                placeholder="jane@acme.com"
+                placeholder="estefany@acme.com"
               />
             </div>
             <div className="form-group">

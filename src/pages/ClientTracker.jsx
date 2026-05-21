@@ -218,7 +218,7 @@ export default function ClientTracker() {
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="Jane Doe"
+                  placeholder="Estefany Squires"
                   autoComplete="off"
                 />
                 {errors.name && <div className="inline-error">{errors.name}</div>}
@@ -243,7 +243,7 @@ export default function ClientTracker() {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="jane@acme.com"
+                  placeholder="estefany@acme.com"
                 />
               </div>
 

@@ -618,7 +618,7 @@ export default function ClientPortal() {
                       </div>
                       <div className="portal-form-group">
                         <label className="portal-label">Email <span className="portal-required">*</span></label>
-                        <input type="email" name="email" className="portal-input" value={contact.email} onChange={contactChange} placeholder="jane@yourbusiness.com" />
+                        <input type="email" name="email" className="portal-input" value={contact.email} onChange={contactChange} placeholder="estefany@yourbusiness.com" />
                       </div>
                       <div className="portal-form-group">
                         <label className="portal-label">Phone (optional)</label>
@@ -705,7 +705,7 @@ export default function ClientPortal() {
                   <div className="portal-grid-2">
                     <div className="portal-form-group">
                       <label className="portal-label">Your Name <span className="portal-required">*</span></label>
-                      <input type="text" name="name" className="portal-input" value={consult.name} onChange={consultChange} placeholder="Jane Smith" required />
+                      <input type="text" name="name" className="portal-input" value={consult.name} onChange={consultChange} placeholder="Estefany Squires" required />
                     </div>
                     <div className="portal-form-group">
                       <label className="portal-label">Business / Brand</label>
@@ -713,7 +713,7 @@ export default function ClientPortal() {
                     </div>
                     <div className="portal-form-group">
                       <label className="portal-label">Email <span className="portal-required">*</span></label>
-                      <input type="email" name="email" className="portal-input" value={consult.email} onChange={consultChange} placeholder="jane@yourbusiness.com" required />
+                      <input type="email" name="email" className="portal-input" value={consult.email} onChange={consultChange} placeholder="estefany@yourbusiness.com" required />
                     </div>
                     <div className="portal-form-group">
                       <label className="portal-label">Phone (optional)</label>
@@ -759,11 +759,11 @@ export default function ClientPortal() {
                   <div className="portal-grid-2">
                     <div className="portal-form-group">
                       <label className="portal-label">Your Name <span className="portal-required">*</span></label>
-                      <input type="text" name="name" className="portal-input" value={msg.name} onChange={msgChange} placeholder="Jane Smith" required />
+                      <input type="text" name="name" className="portal-input" value={msg.name} onChange={msgChange} placeholder="Estefany Squires" required />
                     </div>
                     <div className="portal-form-group">
                       <label className="portal-label">Email <span className="portal-required">*</span></label>
-                      <input type="email" name="email" className="portal-input" value={msg.email} onChange={msgChange} placeholder="jane@yourbusiness.com" required />
+                      <input type="email" name="email" className="portal-input" value={msg.email} onChange={msgChange} placeholder="estefany@yourbusiness.com" required />
                     </div>
                   </div>
                   <div className="portal-form-group">
@@ -1025,7 +1025,7 @@ function FilesTab() {
           </div>
           <div className="portal-form-group">
             <label className="portal-label">Your Email</label>
-            <input type="email" className="portal-input" value={clientEmail} onChange={e=>setClientEmail(e.target.value)} placeholder="jane@yourbusiness.com" />
+            <input type="email" className="portal-input" value={clientEmail} onChange={e=>setClientEmail(e.target.value)} placeholder="estefany@yourbusiness.com" />
           </div>
           <div className="portal-form-group">
             <label className="portal-label">File Description</label>

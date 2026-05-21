@@ -173,7 +173,7 @@ export default function ContractBuilder() {
                 <div className="form-group">
                   <label className="form-label">Client Email</label>
                   <input type="email" name="clientEmail" className="form-input" value={form.clientEmail} onChange={change}
-                    placeholder="jane@company.com" />
+                    placeholder="estefany@company.com" />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Client Business</label>
