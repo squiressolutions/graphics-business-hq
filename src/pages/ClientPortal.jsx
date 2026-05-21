@@ -36,7 +36,7 @@ const SERVICES_INTAKE = [
   { id: 'brand-identity',   Icon: Palette,    title: 'Brand Identity',     desc: 'Full brand system — logo, colors, typography, guidelines', from: 'From $1,197' },
   { id: 'logo-design',      Icon: PenTool,    title: 'Logo Design',         desc: 'Professional logo with revisions & source files',          from: 'From $497'   },
   { id: 'social-media-kit', Icon: Share2,     title: 'Social Media Kit',    desc: 'Templates & graphics for Instagram, TikTok, Facebook',    from: 'From $399'   },
-  { id: 'website-design',   Icon: Monitor,    title: 'Website Design',      desc: 'Custom website — design, development & launch',           from: 'From $670'   },
+  { id: 'website-design',   Icon: Monitor,    title: 'Website Design',      desc: 'Custom website — design, development & launch',           from: 'From $600'   },
   { id: 'print-design',     Icon: Package,    title: 'Print & Packaging',   desc: 'Business cards, flyers, packaging, signage & more',       from: 'From $799'   },
   { id: 'ad-creative',      Icon: Megaphone,  title: 'Ad Creative',         desc: 'Meta, TikTok & Google ad graphics and copy',              from: 'From $299'   },
   { id: 'full-rebrand',     Icon: RefreshCw,  title: 'Full Rebrand',        desc: 'Complete overhaul — strategy, identity, collateral & rollout', from: 'From $3,697' },
@@ -973,7 +973,7 @@ function FilesTab() {
   )
 
   return (
-    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, alignItems:'start' }}>
+    <div className="portal-files-grid">
 
       {/* Left: Upload */}
       <div className="portal-card">

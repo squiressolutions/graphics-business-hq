@@ -55,9 +55,9 @@ const TIERS = [
   },
   {
     name: 'Website',
-    price: '670',
-    priceSuffix: '+ $40/mo',
-    originalPrice: '900',
+    price: '600',
+    priceSuffix: '+ $63/mo',
+    originalPrice: '997',
     period: 'upfront',
     badge: 'New',
     badgeClass: 'badge-cyan',

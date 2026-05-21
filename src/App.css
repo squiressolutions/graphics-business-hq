@@ -465,6 +465,8 @@ a {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .card + .card {
@@ -1475,12 +1477,13 @@ a {
 }
 
 .portal-header-inner {
-  max-width: 860px;
+  max-width: 1160px;
   margin: 0 auto;
   height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .portal-logo {
@@ -1526,6 +1529,16 @@ a {
 }
 
 .portal-contact-link:hover { color: var(--accent2); }
+
+@media (max-width: 480px) {
+  .portal-contact-link {
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+  }
+}
 
 /* Body — sidebar layout */
 .portal-body {
@@ -1707,6 +1720,8 @@ a {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 36px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .portal-step-header {
@@ -2446,9 +2461,20 @@ abbr[title="required"] {
   background: rgba(212,160,23,0.04);
 }
 
-/* ── Files tab responsive ─────────────────────────────────── */
+/* ── Files tab grid ───────────────────────────────────────── */
+.portal-files-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
 @media (max-width: 768px) {
-  .portal-body > div[style*="grid-template-columns"] {
+  .portal-files-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Fallback: any inline-grid inside portal-tab-content */
+  .portal-tab-content > div[style*="grid-template-columns"] {
     grid-template-columns: 1fr !important;
   }
 }

@@ -577,7 +577,7 @@ export default function CampaignBuilder() {
                     {result.utmParameters.breakdown.map((row, i) => (
                       <div key={i} style={{
                         display: 'grid',
-                        gridTemplateColumns: '160px 1fr',
+                        gridTemplateColumns: 'minmax(100px, 160px) 1fr',
                         gap: '0',
                         background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
                         borderBottom: i < result.utmParameters.breakdown.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
@@ -602,7 +602,7 @@ export default function CampaignBuilder() {
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', marginBottom: '14px' }}>
                 Launch Timeline
               </h3>
-              <div className="grid-3" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+              <div className="grid-3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
                 {result.timeline.map((week, i) => {
                   const colors = WEEK_COLORS[i] || WEEK_COLORS[0];
                   return (
