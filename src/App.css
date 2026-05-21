@@ -3,18 +3,25 @@
    ============================================================ */
 
 /* --- CSS Variables ----------------------------------------- */
+/*
+  ORIGINAL BLUE THEME (restore by replacing the values below):
+  --bg:      #050C1A   --bg2:    #091428   --bg3:    #0D1C38
+  --border:  #162945   --border2:#1F3A5E
+  --text:    #EDE8D5   --muted:  #6888A8   --muted2: #94AAC4
+  --accent3: #5B9BD5
+*/
 :root {
-  --bg:                #050C1A;
-  --bg2:               #091428;
-  --bg3:               #0D1C38;
-  --border:            #162945;
-  --border2:           #1F3A5E;
-  --text:              #EDE8D5;
-  --muted:             #6888A8;
-  --muted2:            #94AAC4;
+  --bg:                #0A0A0A;
+  --bg2:               #111111;
+  --bg3:               #1A1A1A;
+  --border:            #242424;
+  --border2:           #333333;
+  --text:              #F0EDE4;
+  --muted:             #888888;
+  --muted2:            #AAAAAA;
   --accent:            #D4A017;
   --accent2:           #EDD86A;
-  --accent3:           #5B9BD5;
+  --accent3:           #CCCCCC;
   --green:             #3DD68C;
   --orange:            #F59E0B;
   --red:               #E55A5A;
