@@ -1168,12 +1168,8 @@ function PortalFooter() {
           <a href="https://www.behance.net/kc144" target="_blank" rel="noreferrer" style={{ display:'flex', alignItems:'center', gap:5, color:'var(--muted2)', fontSize:12, textDecoration:'none' }}>
             <ExternalLink size={13} /> Behance
           </a>
-          {/* TODO: Replace # with real social profile URLs */}
-          <a href="#" style={{ display:'flex', alignItems:'center', gap:5, color:'var(--muted2)', fontSize:12, textDecoration:'none' }}>
-            <Share2 size={13} /> Instagram
-          </a>
-          <a href="#" style={{ display:'flex', alignItems:'center', gap:5, color:'var(--muted2)', fontSize:12, textDecoration:'none' }}>
-            <ExternalLink size={13} /> LinkedIn
+          <a href="https://www.instagram.com/squires.solutions" target="_blank" rel="noreferrer" style={{ display:'flex', alignItems:'center', gap:5, color:'var(--muted2)', fontSize:12, textDecoration:'none' }}>
+            <Share2 size={13} /> @squires.solutions
           </a>
         </div>
         <div style={{ fontSize:11, color:'var(--muted)' }}>© {new Date().getFullYear()} Squires Solutions · All rights reserved</div>
