@@ -5,7 +5,7 @@ import { Palette, Share2, ClipboardList, Megaphone, PenTool, Tag, Target, BarCha
 const AGENTS = [
   {
     name: 'Brand Studio',
-    route: '/brand-studio',
+    route: '/admin/brand-studio',
     description: 'Create brand identities, palettes, and logo concepts.',
     badge: 'Branding',
     badgeClass: 'badge-violet',
@@ -13,7 +13,7 @@ const AGENTS = [
   },
   {
     name: 'Social Content',
-    route: '/social-content',
+    route: '/admin/social-content',
     description: 'Generate posts, captions, and content calendars.',
     badge: 'Social',
     badgeClass: 'badge-pink',
@@ -21,7 +21,7 @@ const AGENTS = [
   },
   {
     name: 'Client Brief',
-    route: '/client-brief',
+    route: '/admin/client-brief',
     description: 'Turn client intake into detailed project briefs.',
     badge: 'Strategy',
     badgeClass: 'badge-cyan',
@@ -29,7 +29,7 @@ const AGENTS = [
   },
   {
     name: 'Ad Creative',
-    route: '/ad-creative',
+    route: '/admin/ad-creative',
     description: 'Concept Meta, TikTok, and Google ad campaigns.',
     badge: 'Advertising',
     badgeClass: 'badge-pink',
@@ -37,7 +37,7 @@ const AGENTS = [
   },
   {
     name: 'Content Writer',
-    route: '/content-writer',
+    route: '/admin/content-writer',
     description: 'Write case studies, web copy, and service pages.',
     badge: 'Copywriting',
     badgeClass: 'badge-violet',
@@ -45,7 +45,7 @@ const AGENTS = [
   },
   {
     name: 'Pricing',
-    route: '/pricing',
+    route: '/admin/pricing',
     description: 'Price projects and generate formal proposals.',
     badge: 'Business',
     badgeClass: 'badge-cyan',
@@ -53,7 +53,7 @@ const AGENTS = [
   },
   {
     name: 'Prospector',
-    route: '/prospector',
+    route: '/admin/prospector',
     description: 'Find ideal clients and generate outreach sequences.',
     badge: 'Sales',
     badgeClass: 'badge-orange',
@@ -61,7 +61,7 @@ const AGENTS = [
   },
   {
     name: 'Campaign Builder',
-    route: '/campaign',
+    route: '/admin/campaign',
     description: 'Build full ad campaigns with copy, creatives, and strategy.',
     badge: 'Marketing',
     badgeClass: 'badge-pink',
