@@ -146,6 +146,7 @@ function AppShell() {
 
       <main className="main-content">
         <Routes>
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/brand-studio" element={<BrandStudio />} />
           <Route path="/admin/social-content" element={<SocialContent />} />
@@ -161,7 +162,6 @@ function AppShell() {
           <Route path="/admin/contracts" element={<ContractBuilder />} />
           <Route path="/admin/requests" element={<ClientRequests />} />
           <Route path="/admin/uploads" element={<Uploads />} />
-          <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
         </Routes>
         <Footer />
       </main>
@@ -176,7 +176,7 @@ export default function App() {
         <Route path="/" element={<ClientPortal />} />
         <Route path="/portal" element={<Navigate to="/" replace />} />
         <Route path="/portal/*" element={<Navigate to="/" replace />} />
-        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="/admin" element={<AdminGate><AppShell /></AdminGate>} />
         <Route path="/admin/*" element={<AdminGate><AppShell /></AdminGate>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
