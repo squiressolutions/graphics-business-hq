@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Lock, Eye, EyeOff } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import Footer from './components/Footer'
 import Dashboard from './pages/Dashboard'
@@ -56,7 +57,9 @@ function AdminGate({ children }) {
         textAlign: 'center',
         animation: shake ? 'adminShake 0.5s ease' : 'none',
       }}>
-        <div style={{ fontSize: 36, marginBottom: 16 }}>🔐</div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+          <Lock size={36} color="var(--accent)" strokeWidth={1.5} />
+        </div>
         <h2 style={{
           fontFamily: 'var(--font-display)', fontSize: 22, letterSpacing: '0.06em',
           color: 'var(--text)', marginBottom: 6,
@@ -86,7 +89,7 @@ function AdminGate({ children }) {
               background: 'none', border: 'none', cursor: 'pointer',
               color: 'var(--muted)', fontSize: 13, padding: 0,
             }}
-          >{hidden ? '👁' : '🙈'}</button>
+          >{hidden ? <Eye size={15} /> : <EyeOff size={15} />}</button>
         </div>
         <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
           Unlock
