@@ -21,31 +21,31 @@ const navSections = [
   {
     label: 'Overview',
     items: [
-      { to: '/dashboard',      icon: LayoutDashboard, label: 'Dashboard' },
+      { to: '/admin/dashboard',      icon: LayoutDashboard, label: 'Dashboard' },
     ],
   },
   {
     label: 'AI Agents',
     items: [
-      { to: '/brand-studio',   icon: Palette,        label: 'Brand Studio' },
-      { to: '/social-content', icon: Share2,          label: 'Social Content' },
-      { to: '/client-brief',   icon: ClipboardList,   label: 'Client Brief' },
-      { to: '/ad-creative',    icon: Megaphone,       label: 'Ad Creative' },
-      { to: '/content-writer', icon: PenTool,         label: 'Content Writer' },
-      { to: '/pricing',        icon: Tag,             label: 'Pricing' },
-      { to: '/prospector',     icon: Target,          label: 'Prospector' },
-      { to: '/campaign',       icon: BarChart2,       label: 'Campaign Builder' },
+      { to: '/admin/brand-studio',   icon: Palette,        label: 'Brand Studio' },
+      { to: '/admin/social-content', icon: Share2,          label: 'Social Content' },
+      { to: '/admin/client-brief',   icon: ClipboardList,   label: 'Client Brief' },
+      { to: '/admin/ad-creative',    icon: Megaphone,       label: 'Ad Creative' },
+      { to: '/admin/content-writer', icon: PenTool,         label: 'Content Writer' },
+      { to: '/admin/pricing',        icon: Tag,             label: 'Pricing' },
+      { to: '/admin/prospector',     icon: Target,          label: 'Prospector' },
+      { to: '/admin/campaign',       icon: BarChart2,       label: 'Campaign Builder' },
     ],
   },
   {
     label: 'Business',
     items: [
-      { to: '/clients',   icon: Users,       label: 'Client Tracker' },
-      { to: '/invoices',  icon: Receipt,     label: 'Invoices' },
-      { to: '/expenses',  icon: Wallet,      label: 'Expenses' },
-      { to: '/contracts', icon: FileText,    label: 'Contracts' },
-      { to: '/requests',  icon: Inbox,       label: 'Client Requests' },
-      { to: '/uploads',   icon: FolderOpen,  label: 'Client Uploads' },
+      { to: '/admin/clients',   icon: Users,       label: 'Client Tracker' },
+      { to: '/admin/invoices',  icon: Receipt,     label: 'Invoices' },
+      { to: '/admin/expenses',  icon: Wallet,      label: 'Expenses' },
+      { to: '/admin/contracts', icon: FileText,    label: 'Contracts' },
+      { to: '/admin/requests',  icon: Inbox,       label: 'Client Requests' },
+      { to: '/admin/uploads',   icon: FolderOpen,  label: 'Client Uploads' },
     ],
   },
 ]
@@ -54,7 +54,7 @@ export default function Sidebar({ isOpen, onToggle }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <Link to="/dashboard" className="sidebar-logo-mark" style={{ textDecoration: 'none' }}>
+        <Link to="/admin/dashboard" className="sidebar-logo-mark" style={{ textDecoration: 'none' }}>
           <img src="/logo.png" alt="Squires Solutions" className="sidebar-logo-icon" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 4 }} />
           {isOpen && (
             <div className="sidebar-logo-text-wrap">

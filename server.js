@@ -223,7 +223,7 @@ async function sendIntakeNotification(entry) {
     <div style="background:#ffffff;border:1px solid #e5e5e5;border-radius:0 0 10px 10px;padding:24px;">
       <table style="width:100%;border-collapse:collapse;">${tableRows}</table>
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid #eee;">
-        <a href="${SITE_URL}/client-requests"
+        <a href="${SITE_URL}/admin/requests"
            style="display:inline-block;background:#D4A017;color:#0a0a0a;font-weight:700;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:14px;letter-spacing:.5px;">
           View in Admin →
         </a>
@@ -897,7 +897,7 @@ app.post('/api/portal/upload', (req, res) => {
           <div style="margin-top:16px;padding:12px;background:#fff8e1;border-radius:6px;font-size:12px;color:#888;">
             Files are stored on the server temporarily. Download them promptly as they may be cleared on server redeploy.
           </div>
-          <div style="margin-top:20px;"><a href="${SITE_URL}/client-requests" style="display:inline-block;background:#D4A017;color:#0a0a0a;font-weight:700;padding:10px 22px;border-radius:8px;text-decoration:none;font-size:13px;">View Admin Portal →</a></div>
+          <div style="margin-top:20px;"><a href="${SITE_URL}/admin/requests" style="display:inline-block;background:#D4A017;color:#0a0a0a;font-weight:700;padding:10px 22px;border-radius:8px;text-decoration:none;font-size:13px;">View Admin Portal →</a></div>
         </div>
       </div>`;
       await resend.emails.send({
