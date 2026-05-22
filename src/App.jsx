@@ -19,6 +19,7 @@ import ContractBuilder from './pages/ContractBuilder'
 import ClientPortal from './pages/ClientPortal'
 import ClientRequests from './pages/ClientRequests'
 import Uploads from './pages/Uploads'
+import MetaAds from './pages/MetaAds'
 
 // ─── Admin Password Gate ──────────────────────────────────────────────────────
 const ADMIN_PW = import.meta.env.VITE_ADMIN_PASSWORD || 'Chase0613'
@@ -176,6 +177,7 @@ export default function App() {
           <Route path="contracts" element={<ContractBuilder />} />
           <Route path="requests" element={<ClientRequests />} />
           <Route path="uploads" element={<Uploads />} />
+          <Route path="meta-ads" element={<MetaAds />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

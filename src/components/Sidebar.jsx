@@ -15,6 +15,7 @@ import {
   FileText,
   Inbox,
   FolderOpen,
+  TrendingUp,
 } from 'lucide-react'
 
 const navSections = [
@@ -46,6 +47,7 @@ const navSections = [
       { to: '/admin/contracts', icon: FileText,    label: 'Contracts' },
       { to: '/admin/requests',  icon: Inbox,       label: 'Client Requests' },
       { to: '/admin/uploads',   icon: FolderOpen,  label: 'Client Uploads' },
+      { to: '/admin/meta-ads',  icon: TrendingUp,  label: 'Meta Ads' },
     ],
   },
 ]

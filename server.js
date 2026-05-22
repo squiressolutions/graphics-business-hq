@@ -1019,6 +1019,61 @@ app.get('/api/portal/file/:filename', (req, res) => {
   res.download(fp);
 });
 
+// ─── Meta Ads ─────────────────────────────────────────────────────────────────
+
+const META_TOKEN   = process.env.META_ACCESS_TOKEN
+const META_ACCOUNT = process.env.META_AD_ACCOUNT_ID
+const META_BASE    = 'https://graph.facebook.com/v19.0'
+
+async function metaFetch(path) {
+  const url = `${META_BASE}${path}${path.includes('?') ? '&' : '?'}access_token=${META_TOKEN}`
+  const res = await fetch(url)
+  const data = await res.json()
+  if (data.error) throw new Error(data.error.message)
+  return data
+}
+
+// Account-level insights (last 30 days)
+app.get('/api/meta/insights', async (_req, res) => {
+  if (!META_TOKEN || !META_ACCOUNT) return res.status(400).json({ error: 'Meta credentials not configured' })
+  try {
+    const data = await metaFetch(`/${META_ACCOUNT}/insights?fields=spend,impressions,clicks,ctr,cpm,reach&date_preset=last_30d`)
+    res.json(data.data?.[0] || {})
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})
+
+// Campaigns list
+app.get('/api/meta/campaigns', async (_req, res) => {
+  if (!META_TOKEN || !META_ACCOUNT) return res.status(400).json({ error: 'Meta credentials not configured' })
+  try {
+    const data = await metaFetch(`/${META_ACCOUNT}/campaigns?fields=id,name,status,objective,daily_budget,lifetime_budget,insights{spend,impressions,clicks,ctr}&date_preset=last_30d&limit=20`)
+    res.json(data.data || [])
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})
+
+// Create a draft campaign
+app.post('/api/meta/campaigns', async (req, res) => {
+  if (!META_TOKEN || !META_ACCOUNT) return res.status(400).json({ error: 'Meta credentials not configured' })
+  try {
+    const { name, objective, daily_budget } = req.body
+    const url = `${META_BASE}/${META_ACCOUNT}/campaigns?access_token=${META_TOKEN}`
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, objective, daily_budget: Math.round(daily_budget * 100), status: 'PAUSED', special_ad_categories: [] }),
+    })
+    const data = await r.json()
+    if (data.error) throw new Error(data.error.message)
+    res.json(data)
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})
+
 // ─── Static / SPA ─────────────────────────────────────────────────────────────
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
