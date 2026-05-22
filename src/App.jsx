@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom'
 import { Lock, Eye, EyeOff } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import Footer from './components/Footer'
@@ -145,24 +145,7 @@ function AppShell() {
       </header>
 
       <main className="main-content">
-        <Routes>
-          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/brand-studio" element={<BrandStudio />} />
-          <Route path="/admin/social-content" element={<SocialContent />} />
-          <Route path="/admin/client-brief" element={<ClientBrief />} />
-          <Route path="/admin/ad-creative" element={<AdCreative />} />
-          <Route path="/admin/content-writer" element={<ContentWriter />} />
-          <Route path="/admin/pricing" element={<Pricing />} />
-          <Route path="/admin/prospector" element={<Prospector />} />
-          <Route path="/admin/campaign" element={<CampaignBuilder />} />
-          <Route path="/admin/clients" element={<ClientTracker />} />
-          <Route path="/admin/invoices" element={<InvoiceGenerator />} />
-          <Route path="/admin/expenses" element={<ExpenseTracker />} />
-          <Route path="/admin/contracts" element={<ContractBuilder />} />
-          <Route path="/admin/requests" element={<ClientRequests />} />
-          <Route path="/admin/uploads" element={<Uploads />} />
-        </Routes>
+        <Outlet />
         <Footer />
       </main>
     </div>
@@ -176,8 +159,24 @@ export default function App() {
         <Route path="/" element={<ClientPortal />} />
         <Route path="/portal" element={<Navigate to="/" replace />} />
         <Route path="/portal/*" element={<Navigate to="/" replace />} />
-        <Route path="/admin" element={<AdminGate><AppShell /></AdminGate>} />
-        <Route path="/admin/*" element={<AdminGate><AppShell /></AdminGate>} />
+        <Route path="/admin" element={<AdminGate><AppShell /></AdminGate>}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="brand-studio" element={<BrandStudio />} />
+          <Route path="social-content" element={<SocialContent />} />
+          <Route path="client-brief" element={<ClientBrief />} />
+          <Route path="ad-creative" element={<AdCreative />} />
+          <Route path="content-writer" element={<ContentWriter />} />
+          <Route path="pricing" element={<Pricing />} />
+          <Route path="prospector" element={<Prospector />} />
+          <Route path="campaign" element={<CampaignBuilder />} />
+          <Route path="clients" element={<ClientTracker />} />
+          <Route path="invoices" element={<InvoiceGenerator />} />
+          <Route path="expenses" element={<ExpenseTracker />} />
+          <Route path="contracts" element={<ContractBuilder />} />
+          <Route path="requests" element={<ClientRequests />} />
+          <Route path="uploads" element={<Uploads />} />
+        </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
